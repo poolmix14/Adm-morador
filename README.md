@@ -1,4 +1,4 @@
-# ADM Morador
+# ADM Morador · Condomínio Annecy
 
 App web para editar a planilha de moradores (Bloco 1 e Bloco 2) e baixar em PDF (para imprimir, abra o PDF), em A4 deitado.
 
@@ -17,3 +17,8 @@ App web para editar a planilha de moradores (Bloco 1 e Bloco 2) e baixar em PDF 
   - **Cabeçalhos**: título, avisos, endereço e ramais do interfone.
   - **Página e backup**: margens, letra, colunas, backup e restaurar a planilha original.
 - Os dados ficam salvos no navegador de cada aparelho. Para levar do PC para o celular, use exportar e importar backup.
+
+## Arquivos
+- `index.html`: o app.
+- `card-whatsapp.jpg`: imagem do card quando o link é enviado no WhatsApp.
+- `icone-192.png`, `icone-512.png`, `apple-touch-icon.png`, `favicon-32.png`, `manifest.webmanifest`: ícones do app (aba do navegador e tela de início do celular).
