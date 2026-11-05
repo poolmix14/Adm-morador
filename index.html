@@ -614,14 +614,12 @@ function T(ops, x,y,w,h, sg, size, align='left', o={}){
 }
 const line = (ops,x1,y1,x2,y2,lw=0.22)=>ops.push({t:'line',x1,y1,x2,y2,lw});
 
-// texto do veículo / placa para a planilha geral
-function veiTexto(r){
-  return r.veics.map(v=> v.vaga ? `(VAGA ALUG) ${v.carro} ${v.vaga}`.replace(/\s+/g,' ').trim() : v.carro).filter(s=>s.trim()).join(' / ');
-}
-const plaTexto = r => r.veics.map(v=>v.placa).filter(s=>s.trim()).join(' / ');
 
 /* ---------- Modelo 1: planilha geral ---------- */
-const COLS_G = [['BLOCO',.063],['AP',.037],['MORADOR',.264],['PROPRIETARIO',.183],['VEÍCULO',.257],['PLACA',.196]];
+const COLS_G = [
+  {lab:'BLOCO',f:.05,al:'center',b:1},{lab:'AP',f:.035,al:'center',b:1},
+  {lab:'MORADOR',f:.225,al:'left'},{lab:'PROPRIETARIO',f:.15,al:'left'},
+  {lab:'VEÍCULO 1  ·  PLACA',f:.18,al:'left',b:1},{lab:'VEÍCULO 2  ·  PLACA',f:.18,al:'left',b:1},{lab:'VEÍCULO 3  ·  PLACA',f:.18,al:'left',b:1}];
 function pagesGeral(){
   const [PW,PH] = dims('geral'), st = S.settings;
   return S.blocos.map((b,pi)=>{
@@ -654,14 +652,13 @@ function pagesGeral(){
     const n = Math.max(1, b.rows.length), headH = 4.6;
     const rowH = Math.min(7, (PH - st.mb - y - headH) / n);
     const tH = headH + rowH*b.rows.length;
-    const xs = [x0]; COLS_G.forEach(([,f])=>xs.push(xs[xs.length-1]+f*W));
+    const xs = [x0]; COLS_G.forEach(c=>xs.push(xs[xs.length-1]+c.f*W));
     ops.push({t:'rect', x:x0, y, w:W, h:headH, fill:'#d0d0d0'});
-    COLS_G.forEach(([lab],i)=> T(ops, xs[i], y, xs[i+1]-xs[i], headH, segs(lab,true), 8, 'center', {pad:0.6}));
-    const fs = st.fonte, P = st.paren;
+    COLS_G.forEach((c,i)=> T(ops, xs[i], y, xs[i+1]-xs[i], headH, segs(c.lab,true), 8, 'center', {pad:0.6}));
     b.rows.forEach((r,i)=>{
       const ry = y + headH + i*rowH;
-      [[b.num,true,'center'],[r.ap,true,'center'],[r.mor,false,'left'],[r.prop,false,'left'],[veiTexto(r),true,'center'],[plaTexto(r),true,'center']]
-        .forEach(([v,bold,al],c)=> T(ops, xs[c], ry, xs[c+1]-xs[c], rowH, segs(v,bold,P), fs, al, {pad:0.9}));
+      const vals = [b.num, r.ap, r.mor, r.prop, ...emColunas(r.veics.filter(temVeic), 3, vcell)];
+      COLS_G.forEach((c,ci)=> cellT(ops, c, vals[ci], xs[ci], ry, xs[ci+1]-xs[ci], rowH));
     });
     ops.push({t:'rect', x:x0, y, w:W, h:tH, stroke:true, lw:0.35});
     for(let i=0;i<=b.rows.length;i++){ const ly = y+headH+i*rowH; line(ops,x0,ly,x0+W,ly); }
@@ -671,7 +668,21 @@ function pagesGeral(){
 }
 
 /* ---------- Modelos 2 e 3: um apartamento por linha, uma folha por bloco ---------- */
-// cols: {lab, f, al, b}; valor da célula: string ou {l, r} (texto à esquerda + à direita, ex.: nome e telefone)
+// célula: string ou {l, r} (texto à esquerda + à direita, ex.: nome e telefone / carro e placa)
+function cellT(ops, col, v, cx, ry, cw, rowH){
+  const st = S.settings, P = st.paren, fs = st.fonte, pad = 0.9;
+  if(v && typeof v==='object'){
+    const L = segs(v.l, col.b, P), Rg = segs(v.r, true);
+    if(!v.r){ T(ops, cx, ry, cw, rowH, L, fs, 'left', {pad}); return; }
+    if(!v.l){ T(ops, cx, ry, cw, rowH, Rg, fs, 'right', {pad}); return; }
+    const rs = fit(Rg, fs, cw*0.55), rw = segW(Rg, rs)/0.97 + 1.2;
+    T(ops, cx, ry, cw-rw, rowH, L, fs, 'left', {pad});
+    ops.push({t:'text', x:cx+cw-rw, y:ry, w:rw-1.3, h:rowH, segs:Rg, size:rs, align:'right', u:false});
+  } else T(ops, cx, ry, cw, rowH, segs(v, col.b, P), fs, col.al, {pad});
+}
+const temVeic = v => Object.values(v).some(x=>String(x).trim());
+const vcell = v => ({l: v.vaga ? `${v.carro} (VAGA ${v.vaga})`.trim() : v.carro, r:v.placa});
+// cols: {lab, f, al, b}
 function pagesLinha(mode, sub, cols, rowsOf){
   const [PW,PH] = dims(mode), st = S.settings;
   const x0 = st.ml, W = PW - st.ml - st.mr, headH = 4.8;
@@ -691,17 +702,7 @@ function pagesLinha(mode, sub, cols, rowsOf){
     rows.forEach((vals,ri)=>{
       const ry = y + headH + ri*rowH;
       if(st.zebra && ri%2) fills.push({t:'rect', x:x0, y:ry, w:W, h:rowH, fill:'#efefef'});
-      cols.forEach((col,ci)=>{
-        const v = vals[ci], cx = xs[ci], cw = xs[ci+1]-xs[ci], pad = 0.9;
-        if(v && typeof v==='object'){
-          const L = segs(v.l, col.b, P), Rg = segs(v.r, true);
-          if(!v.r){ T(ops, cx, ry, cw, rowH, L, fs, 'left', {pad}); return; }
-          if(!v.l){ T(ops, cx, ry, cw, rowH, Rg, fs, 'right', {pad}); return; }
-          const rs = fit(Rg, fs, cw*0.55), rw = segW(Rg, rs)/0.97 + 1.2;
-          T(ops, cx, ry, cw-rw, rowH, L, fs, 'left', {pad});
-          ops.push({t:'text', x:cx+cw-rw, y:ry, w:rw-1.3, h:rowH, segs:Rg, size:rs, align:'right', u:false});
-        } else T(ops, cx, ry, cw, rowH, segs(v, col.b, P), fs, col.al, {pad});
-      });
+      cols.forEach((col,ci)=> cellT(ops, col, vals[ci], xs[ci], ry, xs[ci+1]-xs[ci], rowH));
     });
     lines.push({t:'rect', x:x0, y, w:W, h:tH, stroke:true, lw:0.35});
     for(let i=0;i<=rows.length;i++){ const ly = y+headH+i*rowH; line(lines,x0,ly,x0+W,ly); }
@@ -734,13 +735,12 @@ function pagesVeic(){
   const each = (1 - .05 - .04 - .25)/n;
   const cols = [{lab:'BLOCO',f:.05,al:'center',b:1},{lab:'AP',f:.04,al:'center',b:1},{lab:'MORADOR',f:.25,al:'left'}];
   for(let i=1;i<=n;i++) cols.push({lab:n>1?`VEÍCULO ${i}  ·  PLACA`:'VEÍCULO  ·  PLACA',f:each,al:'left',b:1});
-  const vcell = v => ({l: v.vaga ? `${v.carro} (VAGA ${v.vaga})`.trim() : v.carro, r:v.placa});
   return pagesLinha('veic', S.cab.subVeic || 'VEÍCULOS DOS MORADORES', cols, b=> b.rows
     .filter(r=> S.settings.veicTodos || r.veics.some(v=>Object.values(v).some(x=>String(x).trim())))
-    .map(r=> [b.num, r.ap, r.mor, ...emColunas(r.veics.filter(v=>Object.values(v).some(x=>String(x).trim())), n, vcell)]));
+    .map(r=> [b.num, r.ap, r.mor, ...emColunas(r.veics.filter(temVeic), n, vcell)]));
 }
 const MODOS = {
-  geral:{nome:'Planilha geral', pages:pagesGeral, nota:'Uma folha por bloco, com moradores, proprietários e veículos.'},
+  geral:{nome:'Planilha geral', pages:pagesGeral, nota:'Uma folha por bloco, com moradores, proprietários e até 3 veículos com placa (se houver mais, entram juntos no 3º).'},
   tel:{nome:'Telefones', pages:pagesTel, nota:'Uma folha por bloco, um apartamento por linha: nome e telefone de cada morador e, no fim, o proprietário. Apartamento sem contato cadastrado sai com os nomes do morador e o telefone em branco.'},
   veic:{nome:'Veículos', pages:pagesVeic, nota:'Uma folha por bloco, um apartamento por linha: cada veículo com a placa e, se houver, a vaga alugada de outro apartamento.'}
 };
