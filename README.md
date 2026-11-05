@@ -9,7 +9,7 @@ App web para editar a planilha de moradores (Bloco 1 e Bloco 2) e baixar em PDF 
 
 ## Uso
 - **Moradores**: escolha o bloco e o apartamento no topo (ou use a busca) e edite nomes, telefones e veículos. O número do apartamento é fixo. Cada apartamento tem contatos (nome e telefone), telefone do proprietário e veículos (modelo, placa, vaga alugada de outro apartamento).
-- **3 modelos de planilha** (escolha no topo, ao lado de Imprimir): Planilha geral, Telefones e Veículos.
+- **2 modelos de planilha** (escolha em Baixar PDF ou na Prévia): Planilha geral (com até 3 veículos e placas) e Telefones.
 - `*texto*` deixa em negrito. O que estiver entre parênteses, como `( VAZIO )`, sai em negrito automaticamente (dá para desligar em Ajustes).
 - **Prévia**: tela inicial, mostra as folhas (zoom com dois dedos só na folha).
 - **Ajustes** (protegido por senha do administrador), com 3 abas internas:

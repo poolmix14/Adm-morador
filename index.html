@@ -208,7 +208,6 @@ main{max-width:1250px;margin:0 auto;padding:16px 16px calc(40px + env(safe-area-
         <span class="pmh">Qual planilha?</span>
         <button data-pm="geral">Planilha geral</button>
         <button data-pm="tel">Telefones</button>
-        <button data-pm="veic">Veículos</button>
       </div>
     </div>
   </div>
@@ -230,7 +229,6 @@ main{max-width:1250px;margin:0 auto;padding:16px 16px calc(40px + env(safe-area-
     <div class="seg" id="segModo">
       <button data-m="geral">Planilha geral</button>
       <button data-m="tel">Telefones</button>
-      <button data-m="veic">Veículos</button>
     </div>
     <div id="pvSheets"></div>
   </section>
@@ -274,20 +272,15 @@ main{max-width:1250px;margin:0 auto;padding:16px 16px calc(40px + env(safe-area-
         </div>
         <div class="fld"><label>Tamanho da letra da tabela (pt)</label><input type="number" step="0.5" min="5" max="12" data-c="settings.fonte"></div>
         <label class="fld" style="margin-bottom:4px"><span class="lbl" style="font-size:12px">Posição da folha</span></label>
-        <div class="nums3">
+        <div class="nums3" style="grid-template-columns:1fr 1fr">
           <div class="fld"><label>Geral</label><select data-c="settings.orient.geral"><option value="landscape">Deitada</option><option value="portrait">Em pé</option></select></div>
           <div class="fld"><label>Telefones</label><select data-c="settings.orient.tel"><option value="landscape">Deitada</option><option value="portrait">Em pé</option></select></div>
-          <div class="fld"><label>Veículos</label><select data-c="settings.orient.veic"><option value="landscape">Deitada</option><option value="portrait">Em pé</option></select></div>
         </div>
-        <div class="nums3" style="grid-template-columns:1fr 1fr">
-          <div class="fld"><label>Colunas de moradores (telefones)</label><input type="number" min="1" max="5" step="1" data-c="settings.nTel"></div>
-          <div class="fld"><label>Colunas de veículos</label><input type="number" min="1" max="4" step="1" data-c="settings.nVeic"></div>
-        </div>
-        <p class="hint" style="margin-top:-6px">Se um apartamento tiver mais contatos ou veículos que colunas, os que sobrarem entram juntos na última coluna.</p>
+        <div class="fld"><label>Colunas de moradores (planilha de telefones)</label><input type="number" min="1" max="5" step="1" data-c="settings.nTel"></div>
+        <p class="hint" style="margin-top:-6px">Se um apartamento tiver mais contatos que colunas, os que sobrarem entram juntos na última coluna. Na planilha geral cabem até 3 veículos (o que passar disso entra junto no 3º).</p>
         <label class="chk"><input type="checkbox" data-c="settings.upper"> Escrever sempre em MAIÚSCULAS</label>
         <label class="chk"><input type="checkbox" data-c="settings.paren"> Deixar em negrito o que estiver entre parênteses, como ( VAZIO )</label>
-        <label class="chk"><input type="checkbox" data-c="settings.zebra"> Telefones e Veículos: fundo cinza alternado nas linhas</label>
-        <label class="chk"><input type="checkbox" data-c="settings.veicTodos"> Veículos: mostrar também os apartamentos sem carro</label>
+        <label class="chk"><input type="checkbox" data-c="settings.zebra"> Telefones: fundo cinza alternado nas linhas</label>
       </div>
       <div class="card">
         <h2>Backup dos dados</h2>
@@ -314,7 +307,6 @@ main{max-width:1250px;margin:0 auto;padding:16px 16px calc(40px + env(safe-area-
         <div class="fld"><label>Endereço</label><input data-c="cab.endereco"></div>
         <div class="fld"><label>CEP</label><input data-c="cab.cep"></div>
         <div class="fld"><label>Subtítulo da planilha de telefones</label><input data-c="cab.subTel"></div>
-        <div class="fld"><label>Subtítulo da planilha de veículos</label><input data-c="cab.subVeic"></div>
       </div>
       <div class="card">
         <h2>Interfone (folha 2 da planilha geral)</h2>
@@ -335,8 +327,8 @@ main{max-width:1250px;margin:0 auto;padding:16px 16px calc(40px + env(safe-area-
 /* =================== DADOS ORIGINAIS =================== */
 const R = (ap,mor,prop,vei='',pla='') => ({ap,mor,prop,vei,pla});
 const ORIGINAL = {
-  settings:{mt:10,mb:9,ml:12,mr:12,fonte:8.5,upper:true,paren:true,zebra:true,veicTodos:true,nTel:4,nVeic:3,
-            orient:{geral:'landscape',tel:'landscape',veic:'landscape'}},
+  settings:{mt:10,mb:9,ml:12,mr:12,fonte:8.5,upper:true,paren:true,zebra:true,nTel:4,
+            orient:{geral:'landscape',tel:'landscape'}},
   ui:{modo:'geral',bloco:0},
   cab:{
     titulo:'CONDOMÍNIO ANNECY',
@@ -344,8 +336,7 @@ const ORIGINAL = {
     notaDir:'Horario de obras no cond: Seg à Sex 8h as 17h  /  Sab 8h à 12h',
     endereco:'RUA PINTO TELES N° 680',
     cep:'CEP 21341-270',
-    subTel:'TELEFONES DOS MORADORES',
-    subVeic:'VEÍCULOS DOS MORADORES'
+    subTel:'TELEFONES DOS MORADORES'
   },
   inter:{
     titulo:'Interfone',
@@ -784,19 +775,9 @@ function pagesTel(){
     return [b.num, r.ap, ...emColunas(list, n, t=>({l:t.nome, r:t.tel})), {l:r.prop, r:r.propTel}];
   }));
 }
-function pagesVeic(){
-  const n = Math.min(4, Math.max(1, Math.round(S.settings.nVeic||3)));
-  const each = (1 - .05 - .04 - .25)/n;
-  const cols = [{lab:'BLOCO',f:.05,al:'center',b:1},{lab:'AP',f:.04,al:'center',b:1},{lab:'MORADOR',f:.25,al:'left'}];
-  for(let i=1;i<=n;i++) cols.push({lab:n>1?`VEÍCULO ${i}  ·  PLACA`:'VEÍCULO  ·  PLACA',f:each,al:'left',b:1});
-  return pagesLinha('veic', S.cab.subVeic || 'VEÍCULOS DOS MORADORES', cols, b=> b.rows
-    .filter(r=> S.settings.veicTodos || r.veics.some(v=>Object.values(v).some(x=>String(x).trim())))
-    .map(r=> [b.num, r.ap, r.mor, ...emColunas(r.veics.filter(temVeic), n, vcell)]));
-}
 const MODOS = {
   geral:{nome:'Planilha geral', pages:pagesGeral, nota:'Uma folha por bloco, com moradores, proprietários e até 3 veículos com placa (se houver mais, entram juntos no 3º).'},
-  tel:{nome:'Telefones', pages:pagesTel, nota:'Uma folha por bloco, um apartamento por linha: nome e telefone de cada morador e, no fim, o proprietário. Apartamento sem contato cadastrado sai com os nomes do morador e o telefone em branco.'},
-  veic:{nome:'Veículos', pages:pagesVeic, nota:'Uma folha por bloco, um apartamento por linha: cada veículo com a placa e, se houver, a vaga alugada de outro apartamento.'}
+  tel:{nome:'Telefones', pages:pagesTel, nota:'Uma folha por bloco, um apartamento por linha: nome e telefone de cada morador e, no fim, o proprietário. Apartamento sem contato cadastrado sai com os nomes do morador e o telefone em branco.'}
 };
 
 /* =================== DESENHO NA TELA / IMPRESSÃO =================== */
