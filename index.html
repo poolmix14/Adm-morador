@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="nozoom">
+<html lang="pt-BR" class="nozoom gated">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" id="vp" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
@@ -28,6 +28,7 @@
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icone-192.png">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>try{ if(sessionStorage.getItem("admMorador.entrada")==="1") document.documentElement.classList.remove("gated"); }catch(e){}</script>
 <style id="pgsize">@page{size:A4 landscape;margin:0}</style>
 <style>
 :root{
@@ -37,6 +38,19 @@
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 [hidden]{display:none!important}
+/* ---------- tela de entrada ---------- */
+#gate{display:none}
+html.gated #gate{display:flex}
+html.gated body>header,html.gated body>main{display:none}
+#gate{position:fixed;inset:0;z-index:100;background:#000;color:#fff;flex-direction:column;align-items:center;justify-content:center;padding:calc(env(safe-area-inset-top) + 24px) 24px calc(env(safe-area-inset-bottom) + 24px);text-align:center;overflow:auto}
+#gate .glogo{width:min(68vw,300px);height:auto;aspect-ratio:1;border-radius:50%;display:block}
+#gate h1{font-size:clamp(28px,8.5vw,44px);margin:22px 0 26px;font-weight:700;letter-spacing:.3px;line-height:1.1}
+#gate form{display:flex;flex-direction:column;gap:12px;width:min(100%,340px)}
+#gate input{width:100%;padding:15px 16px;border-radius:12px;border:1px solid #333;background:#111;color:#fff;font-size:18px;text-align:center;letter-spacing:2px}
+#gate input::placeholder{color:#777;letter-spacing:.5px}
+#gate input:focus{outline:none;border-color:var(--amber)}
+#gate button{padding:15px;border:0;border-radius:12px;background:var(--amber);color:#111;font-size:17px;font-weight:700}
+#gate .gerr{color:#ff6b5b;font-size:14px;min-height:20px;margin:12px 0 0}
 html.nozoom,html.nozoom body{touch-action:pan-x pan-y}
 html,body{margin:0}
 body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--txt);min-height:100dvh}
@@ -220,6 +234,15 @@ main{max-width:1250px;margin:0 auto;padding:16px 16px calc(40px + env(safe-area-
 </style>
 </head>
 <body>
+<div id="gate">
+  <img class="glogo" src="icone-512.png" alt="Logo do Condomínio Annecy" width="300" height="300">
+  <h1 id="gateTit">Condomínio Annecy</h1>
+  <form id="gateForm" autocomplete="off">
+    <input type="password" id="gatePass" placeholder="Senha" aria-label="Senha" autocomplete="current-password" autocapitalize="none" autocorrect="off" spellcheck="false">
+    <button type="submit">Entrar</button>
+  </form>
+  <p class="gerr" id="gateErr"></p>
+</div>
 
 <header class="top">
   <div class="hrow">
@@ -648,7 +671,10 @@ document.addEventListener('input', e=>{
   if(t.dataset.c==='cab.titulo') setSub();
 });
 document.addEventListener('change', e=>{ if(e.target.type==='checkbox' && e.target.dataset.c) e.target.dispatchEvent(new Event('input',{bubbles:true})); });
-function setSub(){ document.getElementById('titApp').textContent = (S.cab.titulo||'Condomínio').toLocaleLowerCase('pt-BR').replace(/(^|\s)\S/g,m=>m.toUpperCase()); fitTitle(); }
+function setSub(){
+  const t = (S.cab.titulo||'Condomínio').toLocaleLowerCase('pt-BR').replace(/(^|\s)\S/g,m=>m.toUpperCase());
+  document.getElementById('titApp').textContent = t; document.getElementById('gateTit').textContent = t; fitTitle();
+}
 // título do topo o maior possível sem cortar
 function fitTitle(){
   const h = document.getElementById('titApp'); h.style.fontSize = '';
@@ -996,6 +1022,25 @@ const semZoom = ()=> document.documentElement.classList.contains('nozoom');
 ['gesturestart','gesturechange','gestureend'].forEach(ev=> document.addEventListener(ev, e=>{ if(semZoom()) e.preventDefault(); }, {passive:false}));
 document.addEventListener('touchmove', e=>{ if(semZoom() && e.touches.length>1) e.preventDefault(); }, {passive:false});
 // toque duplo: o CSS touch-action (pan-x pan-y) já impede o zoom da página
+
+/* =================== SENHA DE ENTRADA =================== */
+// senha para abrir o app (não diferencia maiúsculas). Fica só o resultado do cálculo, não a senha.
+const ENTRADA_H = '0e1cf793';
+function hashEntrada(t){ let h = 0x811c9dc5; for(const c of 'annecy-entrada:'+t){ h ^= c.charCodeAt(0); h = Math.imul(h, 0x01000193)>>>0; } return h.toString(16).padStart(8,'0'); }
+document.getElementById('gateForm').onsubmit = e=>{
+  e.preventDefault();
+  const i = document.getElementById('gatePass');
+  if(hashEntrada(i.value.trim().toLowerCase())===ENTRADA_H){
+    try{ sessionStorage.setItem('admMorador.entrada','1'); }catch(_){}
+    i.blur();
+    document.documentElement.classList.remove('gated');
+    setHH(); fitTitle(); renderPreview();
+  } else {
+    const g = document.getElementById('gate'); g.classList.remove('shake'); void g.offsetWidth; g.classList.add('shake');
+    document.getElementById('gateErr').textContent = 'Senha incorreta'; i.value=''; i.focus();
+  }
+};
+if(document.documentElement.classList.contains('gated')) setTimeout(()=>document.getElementById('gatePass').focus(), 200);
 
 /* =================== SENHA DO ADMINISTRADOR =================== */
 // a senha não fica escrita no código: só o resultado de um cálculo sobre ela

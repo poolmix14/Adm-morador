@@ -8,6 +8,7 @@ App web para editar a planilha de moradores (Bloco 1 e Bloco 2) e baixar em PDF 
 3. O endereço será `https://SEU-USUARIO.github.io/adm-morador/`.
 
 ## Uso
+- **Entrada**: o app abre pedindo a senha do condomínio (inicial: `annecy680`). Pede de novo a cada vez que o navegador é aberto.
 - **Moradores**: escolha o bloco e o apartamento no topo (ou use a busca) e edite nomes, telefones e veículos. O número do apartamento é fixo. Cada apartamento tem contatos (nome e telefone), telefone do proprietário e veículos (modelo, placa, vaga alugada de outro apartamento).
 - **Planilhas**: a Planilha geral (com até 3 veículos e placas) é pública. A de **Telefones** só aparece na Prévia e no Baixar PDF depois da senha do administrador.
 - `*texto*` deixa em negrito. O que estiver entre parênteses, como `( VAZIO )`, sai em negrito automaticamente (dá para desligar em Ajustes).
