@@ -152,9 +152,16 @@ main{max-width:1250px;margin:0 auto;padding:16px 16px calc(40px + env(safe-area-
 .shake{animation:shake .35s}
 @keyframes shake{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
 .cfgtop{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:4px}
-.cfgtop .seg{margin-bottom:0}
-.cfgtop #bLock{margin-left:auto}
-#cfg-geral,#cfg-cab{margin-top:12px}
+.cfgtop{flex-wrap:nowrap}
+.cfgtop .seg{margin-bottom:0;flex-wrap:nowrap}
+.cfgtop #bLock{margin-left:auto;flex:none}
+@media (max-width:640px){
+  .cfgtop .seg{flex:1;min-width:0}
+  .cfgtop .seg button{flex:1;padding:8px 4px;font-size:13px;line-height:1.15}
+  .cfgtop #bLock{padding:9px 11px}
+  .cfgtop #bLock span{display:none}
+}
+#cfg-geral,#cfg-cab,#cfg-mor{margin-top:12px}
 
 /* ---------- prévia ---------- */
 .seg{display:inline-flex;background:#fff;border-radius:11px;padding:4px;gap:4px;box-shadow:0 1px 3px rgba(0,0,0,.06);margin-bottom:12px;flex-wrap:wrap}
@@ -211,18 +218,15 @@ main{max-width:1250px;margin:0 auto;padding:16px 16px calc(40px + env(safe-area-
     <select class="selmodo" id="selAp" aria-label="Apartamento"></select>
   </div>
   <nav class="tabs" id="tabs">
-    <button data-t="mor" class="on">Moradores</button>
-    <button data-t="pv">Prévia</button>
+    <button data-t="pv" class="on">Prévia</button>
     <button data-t="cfg">Ajustes</button>
   </nav>
 </header>
 
 <main>
-  <section class="panel on" id="p-b0"></section>
-  <section class="panel" id="p-b1"></section>
 
 
-  <section class="panel" id="p-pv">
+  <section class="panel on" id="p-pv">
     <div class="seg" id="segModo">
       <button data-m="geral">Planilha geral</button>
       <button data-m="tel">Telefones</button>
@@ -247,12 +251,17 @@ main{max-width:1250px;margin:0 auto;padding:16px 16px calc(40px + env(safe-area-
     <div id="cfgBody" hidden>
       <div class="cfgtop">
         <div class="seg" id="segCfg">
-          <button data-c2="geral" class="on">Página e backup</button>
+          <button data-c2="mor" class="on">Moradores</button>
           <button data-c2="cab">Cabeçalhos</button>
+          <button data-c2="geral">Página e backup</button>
         </div>
-        <button class="btn light" id="bLock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Bloquear</button>
+        <button class="btn light" id="bLock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><span>Bloquear</span></button>
       </div>
-      <div id="cfg-geral">
+      <div id="cfg-mor">
+        <section class="blkpanel" id="p-b0"></section>
+        <section class="blkpanel" id="p-b1" hidden></section>
+      </div>
+      <div id="cfg-geral" hidden>
     <div class="grid2">
       <div class="card">
         <h2>Página e texto</h2>
@@ -984,27 +993,29 @@ document.getElementById('lockForm').onsubmit = e=>{
   const i = document.getElementById('lockPass');
   if(hashSenha(i.value)===ADM_H){
     try{ sessionStorage.setItem('admMorador.adm','1'); }catch(_){}
-    showCfg(); toast('Ajustes liberados');
+    showCfg(); showPanels(); toast('Ajustes liberados');
   } else {
     const c = document.querySelector('.lockcard'); c.classList.remove('shake'); void c.offsetWidth; c.classList.add('shake');
     document.getElementById('lockErr').textContent = 'Senha incorreta'; i.value=''; i.focus();
   }
 };
-document.getElementById('bLock').onclick = ()=>{ try{ sessionStorage.removeItem('admMorador.adm'); }catch(_){} showCfg(); };
+document.getElementById('bLock').onclick = ()=>{ try{ sessionStorage.removeItem('admMorador.adm'); }catch(_){} showCfg(); showPanels(); };
+let cfgSub = 'mor';
 document.getElementById('segCfg').onclick = e=>{
   const b = e.target.closest('[data-c2]'); if(!b) return;
+  cfgSub = b.dataset.c2;
   document.querySelectorAll('#segCfg button').forEach(x=>x.classList.toggle('on', x===b));
-  document.getElementById('cfg-geral').hidden = b.dataset.c2!=='geral';
-  document.getElementById('cfg-cab').hidden = b.dataset.c2!=='cab';
+  ['mor','geral','cab'].forEach(k=> document.getElementById('cfg-'+k).hidden = k!==cfgSub);
+  showPanels(); scrollTo({top:0});
 };
 
 /* =================== ABAS, BUSCA E NAVEGAÇÃO =================== */
-let cur = 'mor';
+let cur = 'pv';
 const blocoAtual = ()=> Math.min(S.blocos.length-1, Math.max(0, +S.ui.bloco||0));
 function showPanels(){
-  const id = cur==='mor' ? 'p-b'+blocoAtual() : 'p-'+cur;
-  document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('on', p.id===id));
-  document.getElementById('finder').classList.toggle('off', cur!=='mor');
+  document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('on', p.id==='p-'+cur));
+  document.querySelectorAll('.blkpanel').forEach(p=> p.hidden = p.id !== 'p-b'+blocoAtual());
+  document.getElementById('finder').classList.toggle('off', !(cur==='cfg' && cfgSub==='mor' && admOk()));
   setHH();
 }
 document.getElementById('tabs').onclick = e=>{
@@ -1059,6 +1070,7 @@ function refreshAll(){
 load();
 wireBlock(0); wireBlock(1);
 refreshAll();
+renderPreview();
 </script>
 </body>
 </html>
