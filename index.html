@@ -76,7 +76,7 @@ main{max-width:1250px;margin:0 auto;padding:16px 16px calc(40px + env(safe-area-
 .subh b{font-size:12px;text-transform:uppercase;letter-spacing:.4px;color:var(--navy);margin-right:auto;display:flex;align-items:center;gap:6px}
 .subh b svg{width:15px;height:15px}
 .li{display:grid;gap:6px;margin-bottom:6px;align-items:center}
-.li.tel{grid-template-columns:1.5fr 1fr 1.15fr 30px}
+.li.tel{grid-template-columns:1.6fr 1.15fr 30px}
 .li.vei{grid-template-columns:1.5fr .85fr .9fr 30px}
 .li input{background:#fff;padding:8px 9px;font-size:14.5px}
 .empty{font-size:13px;color:var(--muted);padding:4px 2px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
@@ -89,8 +89,10 @@ main{max-width:1250px;margin:0 auto;padding:16px 16px calc(40px + env(safe-area-
   .apt-sub{grid-template-columns:1fr}
 }
 @media (max-width:520px){
-  .li.tel,.li.vei{grid-template-columns:1fr 1fr 30px;grid-template-areas:"a a x" "b c x"}
-  .li>:nth-child(1){grid-area:a}.li>:nth-child(2){grid-area:b}.li>:nth-child(3){grid-area:c}.li>:nth-child(4){grid-area:x}
+  .li.vei{grid-template-columns:1fr 1fr 30px;grid-template-areas:"a a x" "b c x"}
+  .li.vei>:nth-child(1){grid-area:a}.li.vei>:nth-child(2){grid-area:b}.li.vei>:nth-child(3){grid-area:c}.li.vei>:nth-child(4){grid-area:x}
+  .li.tel{grid-template-columns:1fr 30px;grid-template-areas:"a x" "c x"}
+  .li.tel>:nth-child(1){grid-area:a}.li.tel>:nth-child(2){grid-area:c}.li.tel>:nth-child(3){grid-area:x}
   .li{padding-bottom:8px;border-bottom:1px solid var(--line)}
   .li:last-of-type{border-bottom:0}
 }
@@ -220,9 +222,14 @@ main{max-width:1250px;margin:0 auto;padding:16px 16px calc(40px + env(safe-area-
           <div class="fld"><label>Telefones</label><select data-c="settings.orient.tel"><option value="landscape">Deitada</option><option value="portrait">Em pé</option></select></div>
           <div class="fld"><label>Veículos</label><select data-c="settings.orient.veic"><option value="landscape">Deitada</option><option value="portrait">Em pé</option></select></div>
         </div>
+        <div class="nums3" style="grid-template-columns:1fr 1fr">
+          <div class="fld"><label>Colunas de moradores (telefones)</label><input type="number" min="1" max="5" step="1" data-c="settings.nTel"></div>
+          <div class="fld"><label>Colunas de veículos</label><input type="number" min="1" max="4" step="1" data-c="settings.nVeic"></div>
+        </div>
+        <p class="hint" style="margin-top:-6px">Se um apartamento tiver mais contatos ou veículos que colunas, os que sobrarem entram juntos na última coluna.</p>
         <label class="chk"><input type="checkbox" data-c="settings.upper"> Escrever sempre em MAIÚSCULAS</label>
         <label class="chk"><input type="checkbox" data-c="settings.paren"> Deixar em negrito o que estiver entre parênteses, como ( VAZIO )</label>
-        <label class="chk"><input type="checkbox" data-c="settings.zebra"> Telefones e Veículos: fundo cinza alternado por apartamento</label>
+        <label class="chk"><input type="checkbox" data-c="settings.zebra"> Telefones e Veículos: fundo cinza alternado nas linhas</label>
         <label class="chk"><input type="checkbox" data-c="settings.veicTodos"> Veículos: mostrar também os apartamentos sem carro</label>
       </div>
       <div class="card">
@@ -249,7 +256,7 @@ main{max-width:1250px;margin:0 auto;padding:16px 16px calc(40px + env(safe-area-
 /* =================== DADOS ORIGINAIS =================== */
 const R = (ap,mor,prop,vei='',pla='') => ({ap,mor,prop,vei,pla});
 const ORIGINAL = {
-  settings:{mt:10,mb:9,ml:12,mr:12,fonte:8.5,upper:true,paren:true,zebra:true,veicTodos:true,
+  settings:{mt:10,mb:9,ml:12,mr:12,fonte:8.5,upper:true,paren:true,zebra:true,veicTodos:true,nTel:4,nVeic:3,
             orient:{geral:'landscape',tel:'landscape',veic:'landscape'}},
   ui:{modo:'geral'},
   cab:{
@@ -433,7 +440,6 @@ function cardHTML(bi, i){
   const tels = r.tels.map((t,j)=>`
     <div class="li tel" data-list="tels" data-j="${j}">
       <input class="${up}" data-k="nome" value="${esc(t.nome)}" placeholder="Nome" autocomplete="off" spellcheck="false">
-      <input class="${up}" data-k="rel" value="${esc(t.rel)}" placeholder="Parentesco" autocomplete="off" spellcheck="false">
       <input data-k="tel" value="${esc(t.tel)}" placeholder="Telefone" type="tel" inputmode="tel" autocomplete="off">
       <button class="ib del" data-rm="tels" title="Tirar contato" aria-label="Tirar contato">${IC.x}</button>
     </div>`).join('');
@@ -531,12 +537,12 @@ function wireBlock(bi){
     const addl = e.target.closest('[data-addl]');
     if(addl){
       const L = addl.dataset.addl;
-      r[L].push(L==='tels' ? {nome:'',rel:'',tel:''} : {carro:'',placa:'',vaga:''});
+      r[L].push(L==='tels' ? {nome:'',tel:''} : {carro:'',placa:'',vaga:''});
       save(); rebuildCard(bi, i, `.li[data-list="${L}"][data-j="${r[L].length-1}"] input`);
       return;
     }
     if(e.target.closest('[data-fromnames]')){
-      r.tels = nomesDoMorador(r.mor).map(n=>({nome:n, rel:'', tel:''}));
+      r.tels = nomesDoMorador(r.mor).map(n=>({nome:n, tel:''}));
       save(); rebuildCard(bi, i, `.li[data-list="tels"] [data-k="tel"]`);
       return;
     }
@@ -676,105 +682,79 @@ function pagesGeral(){
   });
 }
 
-/* ---------- Modelos 2 e 3: tabelas agrupadas por apartamento ---------- */
-// cols: {lab, f, m(merged), al, b(bold)}; units: [{k, vals:[string | array]}]
-function pagesAgrupadas(mode, sub, cols, unitsOf){
+/* ---------- Modelos 2 e 3: um apartamento por linha, uma folha por bloco ---------- */
+// cols: {lab, f, al, b}; valor da célula: string ou {l, r} (texto à esquerda + à direita, ex.: nome e telefone)
+function pagesLinha(mode, sub, cols, rowsOf){
   const [PW,PH] = dims(mode), st = S.settings;
-  const x0 = st.ml, W = PW - st.ml - st.mr;
-  const headH = 4.8, rowH = Math.max(4.2, st.fonte*0.6);
+  const x0 = st.ml, W = PW - st.ml - st.mr, headH = 4.8;
   const xs = [x0]; cols.forEach(c=>xs.push(xs[xs.length-1]+c.f*W));
-  const pages = [];
-
-  S.blocos.forEach(b=>{
-    const units = unitsOf(b);
-    let pg = null, y, used, zi = 0;
-    const startPage = ()=>{
-      pg = {w:PW, h:PH, ops:[], fills:[], lines:[], blk:b.num};
-      pages.push(pg);
-      const c = S.cab, ops = pg.ops;
-      y = st.mt;
-      T(ops, x0, y, W, 7, segs(c.titulo,true), 15, 'center'); y += 8.4;
-      const left = `${sub}  ·  BLOCO ${b.num}`;
-      T(ops, x0, y, W*0.5, 4.2, segs(left,true), 9.5, 'left');
-      T(ops, x0+W*0.5, y, W*0.5, 4.2, segs('', true), 7.5, 'right'); // placeholder p/ nº da folha
-      pg.folhaOp = ops[ops.length-1];
-      y += 5.2;
-      if(c.endereco || c.cep){
-        T(ops, x0, y-0.6, W, 3.4, segs([c.endereco, c.cep].filter(Boolean).join('     '), false), 7, 'left');
-        y += 3.4;
-      }
-      y += 0.6;
-      pg.top = y;
-      pg.fills.push({t:'rect', x:x0, y, w:W, h:headH, fill:'#d0d0d0'});
-      cols.forEach((c,i)=> T(ops, xs[i], y, xs[i+1]-xs[i], headH, segs(c.lab,true), 8, 'center', {pad:0.6}));
-      y += headH; used = 0;
-      pg.lim = PH - st.mb;
-    };
-    const closePage = ()=>{
-      const ops = pg.lines, tB = y;
-      ops.push({t:'rect', x:x0, y:pg.top, w:W, h:tB-pg.top, stroke:true, lw:0.35});
-      line(ops, x0, pg.top+headH, x0+W, pg.top+headH);
-      for(let i=1;i<cols.length;i++) line(ops, xs[i], pg.top, xs[i], tB);
-    };
-    startPage();
-    units.forEach(u=>{
-      const h = u.k*rowH;
-      if(y + h > pg.lim + 0.01 && used>0){ closePage(); startPage(); }
-      const ops = pg.ops, P = st.paren, fs = st.fonte;
-      if(st.zebra && (zi++ % 2)) pg.fills.push({t:'rect', x:x0, y, w:W, h, fill:'#efefef'});
-      cols.forEach((c,ci)=>{
-        const v = u.vals[ci], cw = xs[ci+1]-xs[ci];
-        if(c.m) T(ops, xs[ci], y, cw, h, segs(v, c.b, P), fs, c.al, {pad:0.9});
-        else for(let s=0;s<u.k;s++) T(ops, xs[ci], y+s*rowH, cw, rowH, segs((v||[])[s]||'', c.b, P), fs, c.al, {pad:0.9});
+  return S.blocos.map(b=>{
+    const fills = [], ops = [], lines = [], c = S.cab, P = st.paren, fs = st.fonte;
+    let y = st.mt;
+    T(ops, x0, y, W, 7, segs(c.titulo,true), 15, 'center'); y += 8.4;
+    T(ops, x0, y, W*0.5, 4.2, segs(`${sub}  ·  BLOCO ${b.num}`,true), 9.5, 'left');
+    T(ops, x0+W*0.4, y, W*0.6, 4.2, segs([c.endereco, c.cep].filter(Boolean).join('          '),true), 7.5, 'right');
+    y += 5.6;
+    const rows = rowsOf(b), n = Math.max(1, rows.length);
+    const rowH = Math.min(7, (PH - st.mb - y - headH) / n);
+    const tH = headH + rowH*rows.length;
+    fills.push({t:'rect', x:x0, y, w:W, h:headH, fill:'#d0d0d0'});
+    cols.forEach((col,i)=> T(ops, xs[i], y, xs[i+1]-xs[i], headH, segs(col.lab,true), 8, 'center', {pad:0.6}));
+    rows.forEach((vals,ri)=>{
+      const ry = y + headH + ri*rowH;
+      if(st.zebra && ri%2) fills.push({t:'rect', x:x0, y:ry, w:W, h:rowH, fill:'#efefef'});
+      cols.forEach((col,ci)=>{
+        const v = vals[ci], cx = xs[ci], cw = xs[ci+1]-xs[ci], pad = 0.9;
+        if(v && typeof v==='object'){
+          const L = segs(v.l, col.b, P), Rg = segs(v.r, true);
+          if(!v.r){ T(ops, cx, ry, cw, rowH, L, fs, 'left', {pad}); return; }
+          if(!v.l){ T(ops, cx, ry, cw, rowH, Rg, fs, 'right', {pad}); return; }
+          const rs = fit(Rg, fs, cw*0.55), rw = segW(Rg, rs)/0.97 + 1.2;
+          T(ops, cx, ry, cw-rw, rowH, L, fs, 'left', {pad});
+          ops.push({t:'text', x:cx+cw-rw, y:ry, w:rw-1.3, h:rowH, segs:Rg, size:rs, align:'right', u:false});
+        } else T(ops, cx, ry, cw, rowH, segs(v, col.b, P), fs, col.al, {pad});
       });
-      // linhas internas só nas colunas que não são mescladas
-      for(let s=1;s<u.k;s++){
-        const ly = y + s*rowH;
-        cols.forEach((c,ci)=>{ if(!c.m) line(pg.lines, xs[ci], ly, xs[ci+1], ly, 0.14); });
-      }
-      y += h; used++;
-      line(pg.lines, x0, y, x0+W, y, 0.22);
     });
-    closePage();
+    lines.push({t:'rect', x:x0, y, w:W, h:tH, stroke:true, lw:0.35});
+    for(let i=0;i<=rows.length;i++){ const ly = y+headH+i*rowH; line(lines,x0,ly,x0+W,ly); }
+    for(let i=1;i<cols.length;i++) line(lines,xs[i],y,xs[i],y+tH);
+    return {w:PW, h:PH, ops:[...fills, ...ops, ...lines]};
   });
-  // nº da folha por bloco
-  const porBloco = {};
-  pages.forEach(p=>{ (porBloco[p.blk] = porBloco[p.blk] || []).push(p); });
-  Object.values(porBloco).forEach(list=> list.forEach((p,i)=>{
-    const o = p.folhaOp; o.segs = segs(`Folha ${i+1} de ${list.length}`, false); o.size = 7.5;
-  }));
-  return pages.map(p=>({w:p.w, h:p.h, ops:[...p.fills, ...p.ops, ...p.lines]}));
 }
-
+// distribui uma lista em n colunas; o que sobrar vai junto na última
+function emColunas(list, n, cell){
+  const out = [];
+  for(let i=0;i<n;i++){
+    if(i===n-1 && list.length>n){ const rest = list.slice(i).map(cell); out.push({l:rest.map(x=>x.l).join(' / '), r:rest.map(x=>x.r).filter(Boolean).join(' / ')}); }
+    else out.push(list[i] ? cell(list[i]) : '');
+  }
+  return out;
+}
 function pagesTel(){
-  const cols = [
-    {lab:'BLOCO',f:.06,m:1,al:'center',b:1},{lab:'AP',f:.05,m:1,al:'center',b:1},
-    {lab:'MORADOR',f:.25,al:'left'},{lab:'PARENTESCO',f:.11,al:'center'},{lab:'TELEFONE',f:.15,al:'center',b:1},
-    {lab:'PROPRIETÁRIO',f:.21,m:1,al:'left'},{lab:'TEL. PROPRIETÁRIO',f:.17,m:1,al:'center',b:1}
-  ];
-  return pagesAgrupadas('tel', S.cab.subTel || 'TELEFONES DOS MORADORES', cols, b=> b.rows.map(r=>{
-    let list = r.tels.length ? r.tels : nomesDoMorador(r.mor).map(n=>({nome:n,rel:'',tel:''}));
-    if(!list.length) list = [{nome:'',rel:'',tel:''}];
-    return {k:list.length, vals:[b.num, r.ap, list.map(t=>t.nome), list.map(t=>UP(t.rel)), list.map(t=>t.tel), r.prop, r.propTel]};
+  const n = Math.min(5, Math.max(1, Math.round(S.settings.nTel||4)));
+  const fixo = .05 + .04, prop = 0.91/(n+1)*1.05, each = (1-fixo-prop)/n;
+  const cols = [{lab:'BLOCO',f:.05,al:'center',b:1},{lab:'AP',f:.04,al:'center',b:1}];
+  for(let i=1;i<=n;i++) cols.push({lab:n>1?`MORADOR ${i}  ·  TELEFONE`:'MORADOR  ·  TELEFONE',f:each,al:'left'});
+  cols.push({lab:'PROPRIETÁRIO  ·  TELEFONE',f:prop,al:'left'});
+  return pagesLinha('tel', S.cab.subTel || 'TELEFONES DOS MORADORES', cols, b=> b.rows.map(r=>{
+    const list = r.tels.length ? r.tels : nomesDoMorador(r.mor).map(nm=>({nome:nm,tel:''}));
+    return [b.num, r.ap, ...emColunas(list, n, t=>({l:t.nome, r:t.tel})), {l:r.prop, r:r.propTel}];
   }));
 }
 function pagesVeic(){
-  const cols = [
-    {lab:'BLOCO',f:.06,m:1,al:'center',b:1},{lab:'AP',f:.05,m:1,al:'center',b:1},
-    {lab:'MORADOR',f:.30,m:1,al:'left'},
-    {lab:'VEÍCULO',f:.27,al:'center',b:1},{lab:'PLACA',f:.13,al:'center',b:1},{lab:'VAGA ALUGADA (AP)',f:.19,al:'center',b:1}
-  ];
-  return pagesAgrupadas('veic', S.cab.subVeic || 'VEÍCULOS DOS MORADORES', cols, b=> b.rows
+  const n = Math.min(4, Math.max(1, Math.round(S.settings.nVeic||3)));
+  const each = (1 - .05 - .04 - .25)/n;
+  const cols = [{lab:'BLOCO',f:.05,al:'center',b:1},{lab:'AP',f:.04,al:'center',b:1},{lab:'MORADOR',f:.25,al:'left'}];
+  for(let i=1;i<=n;i++) cols.push({lab:n>1?`VEÍCULO ${i}  ·  PLACA`:'VEÍCULO  ·  PLACA',f:each,al:'left',b:1});
+  const vcell = v => ({l: v.vaga ? `${v.carro} (VAGA ${v.vaga})`.trim() : v.carro, r:v.placa});
+  return pagesLinha('veic', S.cab.subVeic || 'VEÍCULOS DOS MORADORES', cols, b=> b.rows
     .filter(r=> S.settings.veicTodos || r.veics.some(v=>Object.values(v).some(x=>String(x).trim())))
-    .map(r=>{
-      const list = r.veics.length ? r.veics : [{carro:'',placa:'',vaga:''}];
-      return {k:list.length, vals:[b.num, r.ap, r.mor, list.map(v=>v.carro), list.map(v=>v.placa), list.map(v=>v.vaga)]};
-    }));
+    .map(r=> [b.num, r.ap, r.mor, ...emColunas(r.veics.filter(v=>Object.values(v).some(x=>String(x).trim())), n, vcell)]));
 }
 const MODOS = {
   geral:{nome:'Planilha geral', pages:pagesGeral, nota:'Uma folha por bloco, com moradores, proprietários e veículos.'},
-  tel:{nome:'Telefones', pages:pagesTel, nota:'Cada bloco começa numa folha nova. Se faltar espaço, continua na folha seguinte. Apartamento sem contato cadastrado sai com os nomes do morador e o telefone em branco, para preencher à mão.'},
-  veic:{nome:'Veículos', pages:pagesVeic, nota:'Cada bloco começa numa folha nova. Um veículo por linha, com a vaga alugada de outro apartamento quando houver.'}
+  tel:{nome:'Telefones', pages:pagesTel, nota:'Uma folha por bloco, um apartamento por linha: nome e telefone de cada morador e, no fim, o proprietário. Apartamento sem contato cadastrado sai com os nomes do morador e o telefone em branco.'},
+  veic:{nome:'Veículos', pages:pagesVeic, nota:'Uma folha por bloco, um apartamento por linha: cada veículo com a placa e, se houver, a vaga alugada de outro apartamento.'}
 };
 
 /* =================== DESENHO NA TELA / IMPRESSÃO =================== */
