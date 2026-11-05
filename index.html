@@ -194,7 +194,6 @@ main{max-width:1250px;margin:0 auto;padding:16px 16px calc(40px + env(safe-area-
         <option value="tel">Telefones</option>
         <option value="veic">Veículos</option>
       </select>
-      <button class="btn ghost" id="bPrint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Imprimir</button>
       <button class="btn amber" id="bPdf"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>Baixar PDF</button>
     </div>
   </div>
@@ -872,10 +871,9 @@ function fileName(ext, semModo){
 
 /* =================== AÇÕES =================== */
 function toast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('on'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('on'),2400); }
-document.getElementById('bPrint').onclick = ()=>{ renderPrint(); setTimeout(()=>window.print(), 80); };
 addEventListener('beforeprint', renderPrint);
 document.getElementById('bPdf').onclick = ()=>{
-  if(!window.jspdf){ toast('Sem internet para gerar o PDF. Use Imprimir > Salvar como PDF.'); return; }
+  if(!window.jspdf){ toast('Sem internet para gerar o PDF. Conecte-se e tente de novo.'); return; }
   try{ makePDF().save(fileName('pdf')); toast(`PDF gerado: ${MODOS[modoAtual()].nome}`); }
   catch(e){ console.error(e); toast('Erro ao gerar PDF'); }
 };

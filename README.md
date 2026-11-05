@@ -1,6 +1,6 @@
 # ADM Morador
 
-App web para editar a planilha de moradores (Bloco 1 e Bloco 2) e imprimir ou baixar em PDF, em A4 deitado.
+App web para editar a planilha de moradores (Bloco 1 e Bloco 2) e baixar em PDF (para imprimir, abra o PDF), em A4 deitado.
 
 ## Publicar no GitHub Pages
 1. Crie um repositório (ex.: `adm-morador`) e envie o `index.html`.
