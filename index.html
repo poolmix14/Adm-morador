@@ -9,10 +9,11 @@
 <title>ADM Morador</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2314213d'/%3E%3Cpath d='M14 50V27l18-13 18 13v23H38V36H26v14z' fill='%23fca311'/%3E%3C/svg%3E">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style id="pgsize">@page{size:A4 landscape;margin:0}</style>
 <style>
 :root{
-  --navy:#14213d; --navy2:#1d2d50; --amber:#fca311; --bg:#eef0f4; --card:#fff;
-  --line:#d9dde5; --txt:#1b2230; --muted:#6b7385; --danger:#c0392b;
+  --navy:#14213d; --amber:#fca311; --bg:#eef0f4; --card:#fff;
+  --line:#d9dde5; --txt:#1b2230; --muted:#6b7385; --danger:#c0392b; --soft:#f6f7fa;
   --r:12px;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -27,12 +28,15 @@ header.top{position:sticky;top:0;z-index:20;background:var(--navy);color:#fff;pa
 .brand .logo{width:34px;height:34px;border-radius:9px;background:var(--amber);display:grid;place-items:center;flex:none}
 .brand h1{font-size:18px;margin:0;letter-spacing:.3px}
 .brand small{display:block;font-size:12px;opacity:.7;font-weight:400}
-.actions{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+.actions{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.selmodo{appearance:none;-webkit-appearance:none;border:0;border-radius:10px;padding:9px 30px 9px 12px;font-size:14px;font-weight:600;background:rgba(255,255,255,.12) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 9px center/14px;color:#fff}
+.selmodo option{color:#000}
 .btn{border:0;border-radius:10px;padding:9px 14px;font-weight:600;font-size:14px;display:inline-flex;align-items:center;gap:6px;background:#fff;color:var(--navy)}
 .btn.amber{background:var(--amber);color:#14213d}
 .btn.ghost{background:rgba(255,255,255,.12);color:#fff}
 .btn.light{background:#f1f3f7;color:var(--txt)}
 .btn.danger{background:#fdecea;color:var(--danger)}
+.btn.mini{padding:5px 10px;font-size:13px;border-radius:8px;background:#f1f3f7;color:var(--navy)}
 .btn svg{width:17px;height:17px}
 @media (hover:hover){.btn:hover{filter:brightness(.95)}}
 .btn:active{transform:scale(.97)}
@@ -54,35 +58,41 @@ main{max-width:1250px;margin:0 auto;padding:16px 16px calc(40px + env(safe-area-
 .hint{font-size:13px;color:var(--muted);margin:0 0 12px;line-height:1.45}
 .hint code{background:#fff;border:1px solid var(--line);border-radius:5px;padding:0 4px}
 
-.rows{background:var(--card);border-radius:var(--r);box-shadow:0 1px 3px rgba(0,0,0,.06);overflow:hidden}
-.rh,.row{display:grid;grid-template-columns:70px 1.5fr 1fr 1.4fr 110px 96px;gap:6px;align-items:center;padding:6px 10px}
-.rh{background:#f6f7fa;font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid var(--line);position:sticky;top:0}
-.row{border-bottom:1px solid #eef0f4}
-.row:last-child{border-bottom:0}
-.row input{width:100%;min-width:0;padding:8px 9px;border:1px solid transparent;border-radius:8px;background:transparent;font-size:15px}
-.row input:hover{border-color:var(--line)}
-.row input:focus{outline:none;border-color:var(--amber);background:#fffaf0}
-.row input.ap{font-weight:700;text-align:center}
-.row input.up{text-transform:uppercase}
-.row .lbl{display:none}
-.rowbtns{display:flex;gap:2px;justify-content:flex-end}
-.ib{width:30px;height:30px;border:0;border-radius:8px;background:none;color:var(--muted);display:grid;place-items:center}
+.apt{background:var(--card);border-radius:var(--r);box-shadow:0 1px 3px rgba(0,0,0,.07);margin-bottom:12px;padding:12px 14px 14px}
+.apt-top{display:grid;grid-template-columns:84px 2fr 1.3fr 1fr auto;gap:10px;align-items:end}
+.f{display:flex;flex-direction:column;gap:3px;min-width:0}
+.lbl{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;padding-left:2px}
+.apt input{width:100%;min-width:0;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:#fafbfc;font-size:15px}
+.apt input:focus{outline:none;border-color:var(--amber);background:#fffaf0}
+.apt input.ap{font-weight:700;font-size:17px}
+.apt input.up{text-transform:uppercase}
+.rowbtns{display:flex;gap:2px;justify-content:flex-end;align-self:start}
+.ib{width:30px;height:30px;border:0;border-radius:8px;background:none;color:var(--muted);display:grid;place-items:center;flex:none}
 .ib svg{width:16px;height:16px}
 @media (hover:hover){.ib:hover{background:#f1f3f7;color:var(--txt)}.ib.del:hover{background:#fdecea;color:var(--danger)}}
-.addrow{display:flex;justify-content:center;padding:12px}
+.apt-sub{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:12px}
+.sub{background:var(--soft);border-radius:10px;padding:10px}
+.subh{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.subh b{font-size:12px;text-transform:uppercase;letter-spacing:.4px;color:var(--navy);margin-right:auto;display:flex;align-items:center;gap:6px}
+.subh b svg{width:15px;height:15px}
+.li{display:grid;gap:6px;margin-bottom:6px;align-items:center}
+.li.tel{grid-template-columns:1.5fr 1fr 1.15fr 30px}
+.li.vei{grid-template-columns:1.5fr .85fr .9fr 30px}
+.li input{background:#fff;padding:8px 9px;font-size:14.5px}
+.empty{font-size:13px;color:var(--muted);padding:4px 2px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.addrow{display:flex;justify-content:center;padding:8px 0 12px}
 
-@media (max-width:820px){
-  .rh{display:none}
-  .rows{background:none;box-shadow:none;overflow:visible}
-  .row{grid-template-columns:1fr 1fr;background:#fff;border-radius:var(--r);margin-bottom:10px;padding:10px 12px 12px;box-shadow:0 1px 3px rgba(0,0,0,.07);border:0;gap:8px 10px}
-  .row .f{display:flex;flex-direction:column;gap:3px}
-  .row .lbl{display:block;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;padding-left:2px}
-  .row input{border-color:var(--line);background:#fafbfc;padding:10px}
-  .row{grid-template-columns:1.6fr 1fr;grid-template-areas:"ap btn" "mor mor" "prop prop" "vei pla"}
-  .row .f.apf{grid-area:ap;max-width:120px}.row .f.mor{grid-area:mor}.row .f.prop{grid-area:prop}
-  .row .f.vei{grid-area:vei}.row .f.pla{grid-area:pla}
-  .row .rowbtns{grid-area:btn;align-self:start}
-  .row input.ap{text-align:left;font-size:17px}
+@media (max-width:900px){
+  .apt-top{grid-template-columns:1fr 1fr;grid-template-areas:"ap btn" "mor mor" "prop ptel"}
+  .apt-top .apf{grid-area:ap;max-width:120px}.apt-top .mor{grid-area:mor}.apt-top .prop{grid-area:prop}.apt-top .ptel{grid-area:ptel}
+  .apt-top .rowbtns{grid-area:btn}
+  .apt-sub{grid-template-columns:1fr}
+}
+@media (max-width:520px){
+  .li.tel,.li.vei{grid-template-columns:1fr 1fr 30px;grid-template-areas:"a a x" "b c x"}
+  .li>:nth-child(1){grid-area:a}.li>:nth-child(2){grid-area:b}.li>:nth-child(3){grid-area:c}.li>:nth-child(4){grid-area:x}
+  .li{padding-bottom:8px;border-bottom:1px solid var(--line)}
+  .li:last-of-type{border-bottom:0}
 }
 
 /* ---------- cabeçalho / ajustes ---------- */
@@ -92,23 +102,28 @@ main{max-width:1250px;margin:0 auto;padding:16px 16px calc(40px + env(safe-area-
 .card h2{font-size:15px;margin:0 0 12px;color:var(--navy)}
 .fld{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
 .fld label{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
-.fld input,.fld textarea{padding:10px;border:1px solid var(--line);border-radius:9px;width:100%;background:#fafbfc}
+.fld input,.fld textarea,.fld select{padding:10px;border:1px solid var(--line);border-radius:9px;width:100%;background:#fafbfc}
 .fld textarea{resize:vertical;min-height:90px;line-height:1.4}
 .fld input:focus,.fld textarea:focus{outline:none;border-color:var(--amber);background:#fff}
 .nums{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.nums3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media (max-width:520px){.nums3{grid-template-columns:1fr}}
 .chk{display:flex;align-items:center;gap:8px;font-size:14px;margin:6px 0 12px}
-.chk input{width:18px;height:18px}
+.chk input{width:18px;height:18px;flex:none}
 .btnrow{display:flex;gap:8px;flex-wrap:wrap}
 
 /* ---------- prévia ---------- */
+.seg{display:inline-flex;background:#fff;border-radius:11px;padding:4px;gap:4px;box-shadow:0 1px 3px rgba(0,0,0,.06);margin-bottom:12px;flex-wrap:wrap}
+.seg button{border:0;background:none;padding:8px 14px;border-radius:8px;font-weight:600;font-size:14px;color:var(--muted)}
+.seg button.on{background:var(--navy);color:#fff}
 .pv-note{font-size:13px;color:var(--muted);margin:0 0 12px}
 .pvwrap{margin:0 auto 18px;box-shadow:0 4px 18px rgba(20,33,61,.18);background:#fff;overflow:hidden}
 .pvwrap .sheet{transform-origin:0 0}
 
-/* ---------- folha A4 (tela e impressão) ---------- */
-.sheet{position:relative;width:297mm;height:210mm;background:#fff;overflow:hidden;color:#000;
+/* ---------- folha A4 ---------- */
+.sheet{position:relative;background:#fff;overflow:hidden;color:#000;
   font-family:Arial,Helvetica,"Liberation Sans",Arimo,sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-.sheet svg{position:absolute;left:0;top:0;width:297mm;height:210mm}
+.sheet svg{position:absolute;left:0;top:0}
 .sheet .tx{position:absolute;display:flex;align-items:center;white-space:pre;line-height:1;overflow:visible}
 .sheet .tx>span{position:relative;top:.07em}
 .sheet .tx b{font-weight:700}
@@ -119,11 +134,10 @@ main{max-width:1250px;margin:0 auto;padding:16px 16px calc(40px + env(safe-area-
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
 
 @media print{
-  @page{size:A4 landscape;margin:0}
   html,body{background:#fff}
   body>*:not(#printArea){display:none!important}
   #printArea{display:block}
-  #printArea .sheet{height:209.5mm;page-break-after:always;break-after:page}
+  #printArea .sheet{page-break-after:always;break-after:page}
   #printArea .sheet:last-child{page-break-after:auto;break-after:auto}
 }
 </style>
@@ -135,6 +149,11 @@ main{max-width:1250px;margin:0 auto;padding:16px 16px calc(40px + env(safe-area-
     <div class="logo"><svg viewBox="0 0 64 64" width="22" height="22"><path d="M14 50V27l18-13 18 13v23H38V36H26v14z" fill="#14213d"/></svg></div>
     <h1>ADM Morador <small id="subt">Condomínio</small></h1>
     <div class="actions">
+      <select class="selmodo" id="selModo" aria-label="Modelo de planilha">
+        <option value="geral">Planilha geral</option>
+        <option value="tel">Telefones</option>
+        <option value="veic">Veículos</option>
+      </select>
       <button class="btn ghost" id="bPrint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Imprimir</button>
       <button class="btn amber" id="bPdf"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>Baixar PDF</button>
     </div>
@@ -155,15 +174,17 @@ main{max-width:1250px;margin:0 auto;padding:16px 16px calc(40px + env(safe-area-
   <section class="panel" id="p-cab">
     <div class="grid2">
       <div class="card">
-        <h2>Folha 1: cabeçalho do condomínio</h2>
+        <h2>Cabeçalho do condomínio (todas as planilhas)</h2>
         <div class="fld"><label>Título</label><input data-c="cab.titulo"></div>
-        <div class="fld"><label>Aviso à esquerda</label><input data-c="cab.notaEsq"></div>
-        <div class="fld"><label>Aviso à direita</label><input data-c="cab.notaDir"></div>
+        <div class="fld"><label>Aviso à esquerda (planilha geral)</label><input data-c="cab.notaEsq"></div>
+        <div class="fld"><label>Aviso à direita (planilha geral)</label><input data-c="cab.notaDir"></div>
         <div class="fld"><label>Endereço</label><input data-c="cab.endereco"></div>
         <div class="fld"><label>CEP</label><input data-c="cab.cep"></div>
+        <div class="fld"><label>Subtítulo da planilha de telefones</label><input data-c="cab.subTel"></div>
+        <div class="fld"><label>Subtítulo da planilha de veículos</label><input data-c="cab.subVeic"></div>
       </div>
       <div class="card">
-        <h2>Folha 2: interfone</h2>
+        <h2>Interfone (folha 2 da planilha geral)</h2>
         <div class="fld"><label>Título</label><input data-c="inter.titulo"></div>
         <div class="fld"><label>Ramais abaixo do título (um por linha)</label><textarea data-c="inter.extras" data-lines="1" style="min-height:70px"></textarea></div>
         <div class="fld"><label>Lista de ramais (um por linha · até 28, em 4 colunas de 7)</label><textarea data-c="inter.itens" data-lines="1" style="min-height:300px"></textarea></div>
@@ -172,7 +193,12 @@ main{max-width:1250px;margin:0 auto;padding:16px 16px calc(40px + env(safe-area-
   </section>
 
   <section class="panel" id="p-pv">
-    <p class="pv-note">É assim que as folhas saem na impressão e no PDF: A4 deitado, uma folha por bloco.</p>
+    <div class="seg" id="segModo">
+      <button data-m="geral">Planilha geral</button>
+      <button data-m="tel">Telefones</button>
+      <button data-m="veic">Veículos</button>
+    </div>
+    <p class="pv-note" id="pvNote"></p>
     <div id="pvSheets"></div>
   </section>
 
@@ -188,8 +214,16 @@ main{max-width:1250px;margin:0 auto;padding:16px 16px calc(40px + env(safe-area-
           <div class="fld"><label>Dir.</label><input type="number" step="0.5" min="0" max="40" data-c="settings.mr"></div>
         </div>
         <div class="fld"><label>Tamanho da letra da tabela (pt)</label><input type="number" step="0.5" min="5" max="12" data-c="settings.fonte"></div>
+        <label class="fld" style="margin-bottom:4px"><span class="lbl" style="font-size:12px">Posição da folha</span></label>
+        <div class="nums3">
+          <div class="fld"><label>Geral</label><select data-c="settings.orient.geral"><option value="landscape">Deitada</option><option value="portrait">Em pé</option></select></div>
+          <div class="fld"><label>Telefones</label><select data-c="settings.orient.tel"><option value="landscape">Deitada</option><option value="portrait">Em pé</option></select></div>
+          <div class="fld"><label>Veículos</label><select data-c="settings.orient.veic"><option value="landscape">Deitada</option><option value="portrait">Em pé</option></select></div>
+        </div>
         <label class="chk"><input type="checkbox" data-c="settings.upper"> Escrever sempre em MAIÚSCULAS</label>
         <label class="chk"><input type="checkbox" data-c="settings.paren"> Deixar em negrito o que estiver entre parênteses, como ( VAZIO )</label>
+        <label class="chk"><input type="checkbox" data-c="settings.zebra"> Telefones e Veículos: fundo cinza alternado por apartamento</label>
+        <label class="chk"><input type="checkbox" data-c="settings.veicTodos"> Veículos: mostrar também os apartamentos sem carro</label>
       </div>
       <div class="card">
         <h2>Backup dos dados</h2>
@@ -201,7 +235,7 @@ main{max-width:1250px;margin:0 auto;padding:16px 16px calc(40px + env(safe-area-
         </div>
         <hr style="border:0;border-top:1px solid var(--line);margin:18px 0">
         <h2>Recomeçar</h2>
-        <p class="hint">Volta todos os campos para a planilha original. O que você editou será perdido.</p>
+        <p class="hint">Volta todos os campos para a planilha original. O que você editou (inclusive telefones) será perdido.</p>
         <button class="btn danger" id="bReset">Restaurar planilha original</button>
       </div>
     </div>
@@ -215,13 +249,17 @@ main{max-width:1250px;margin:0 auto;padding:16px 16px calc(40px + env(safe-area-
 /* =================== DADOS ORIGINAIS =================== */
 const R = (ap,mor,prop,vei='',pla='') => ({ap,mor,prop,vei,pla});
 const ORIGINAL = {
-  settings:{mt:10,mb:9,ml:12,mr:12,fonte:8.5,upper:true,paren:true},
+  settings:{mt:10,mb:9,ml:12,mr:12,fonte:8.5,upper:true,paren:true,zebra:true,veicTodos:true,
+            orient:{geral:'landscape',tel:'landscape',veic:'landscape'}},
+  ui:{modo:'geral'},
   cab:{
     titulo:'CONDOMÍNIO ANNECY',
     notaEsq:'Mudanças e uso do elevador para grandes volumes, informar ao Zelador antecipadamente',
     notaDir:'Horario de obras no cond: Seg à Sex 8h as 17h  /  Sab 8h à 12h',
     endereco:'RUA PINTO TELES N° 680',
-    cep:'CEP 21341-270'
+    cep:'CEP 21341-270',
+    subTel:'TELEFONES DOS MORADORES',
+    subVeic:'VEÍCULOS DOS MORADORES'
   },
   inter:{
     titulo:'Interfone',
@@ -303,21 +341,56 @@ const ORIGINAL = {
   ]
 };
 
+/* =================== CONVERSÃO DO FORMATO ANTIGO =================== */
+// "FOX CHUMBO KOU-3804 / C3 PRETO" -> 2 veículos; "(VAGA ALUG) JETSKY 2-104" -> vaga 2-104
+function parseVeics(vei, pla){
+  const s = String(vei||'').trim(), p = String(pla||'').trim();
+  if(!s && !p) return [];
+  const parts = s ? s.split('/').map(x=>x.trim()).filter(Boolean) : [''];
+  const out = parts.map(part=>{
+    const v = {carro:part, placa:'', vaga:''};
+    const m = part.match(/\(\s*VAGA ALUG\.?\s*\)\s*(.*)$/i);
+    if(m){
+      let rest = m[1].trim();
+      const vm = rest.match(/(\d-\d{3})\s*$/);
+      if(vm){ v.vaga = vm[1]; rest = rest.slice(0, vm.index).trim(); }
+      v.carro = rest;
+    }
+    const pm = v.carro.match(/\b([A-Z]{3}-?\d[A-Z0-9]\d{2})\b/i);
+    if(pm){ v.placa = pm[1]; v.carro = v.carro.replace(pm[0],'').replace(/\s{2,}/g,' ').trim(); }
+    v.carro = v.carro.replace(/\s{2,}/g,' ');
+    return v;
+  });
+  if(p){ (out.find(v=>!v.placa) || out[0]).placa = p; }
+  return out;
+}
+function normRow(r){
+  if(!Array.isArray(r.veics)){ r.veics = parseVeics(r.vei, r.pla); }
+  delete r.vei; delete r.pla;
+  if(!Array.isArray(r.tels)) r.tels = [];
+  if(r.propTel==null) r.propTel = '';
+  ['ap','mor','prop'].forEach(k=>{ if(r[k]==null) r[k]=''; });
+  return r;
+}
+function normalize(d){ d.blocos.forEach(b=>b.rows.forEach(normRow)); return d; }
+
 /* =================== ESTADO =================== */
 const KEY = 'admMorador.v1';
 const clone = o => JSON.parse(JSON.stringify(o));
 let S;
+function fresh(){ return normalize(clone(ORIGINAL)); }
 function load(){
   try{
     const raw = localStorage.getItem(KEY);
-    if(raw){ const d = JSON.parse(raw); if(d && d.blocos) { S = merge(clone(ORIGINAL), d); return; } }
+    if(raw){ const d = JSON.parse(raw); if(d && d.blocos){ S = merge(fresh(), d); return; } }
   }catch(e){}
-  S = clone(ORIGINAL);
+  S = fresh();
 }
 function merge(base, d){
-  for(const k of ['settings','cab','inter']) if(d[k]) Object.assign(base[k], d[k]);
+  for(const k of ['cab','inter','ui']) if(d[k]) Object.assign(base[k], d[k]);
+  if(d.settings){ const o = Object.assign({}, base.settings.orient, d.settings.orient||{}); Object.assign(base.settings, d.settings); base.settings.orient = o; }
   if(Array.isArray(d.blocos)) base.blocos = d.blocos;
-  return base;
+  return normalize(base);
 }
 let saveT;
 function save(){
@@ -328,78 +401,157 @@ function save(){
 const getPath = p => p.split('.').reduce((o,k)=>o[k], S);
 function setPath(p,v){ const ks=p.split('.'); const last=ks.pop(); ks.reduce((o,k)=>o[k],S)[last]=v; }
 
-/* =================== UI: ÍCONES =================== */
+/* =================== UTILIDADES =================== */
 const IC = {
   up:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 15l-6-6-6 6"/></svg>',
   down:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 9l6 6 6-6"/></svg>',
   del:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>',
-  search:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>'
+  x:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6L6 18M6 6l12 12"/></svg>',
+  search:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>',
+  phone:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg>',
+  car:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17h14M5 17a2 2 0 1 0 4 0M15 17a2 2 0 1 0 4 0M3 17v-5l2-5h14l2 5v5M3 12h18"/></svg>'
 };
 const esc = s => String(s??'').replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const UP = s => S.settings.upper ? String(s).toLocaleUpperCase('pt-BR') : s;
+function fmtTel(v){
+  const d = v.replace(/\D/g,'').slice(0,11);
+  if(d.length<=2) return d.length? '('+d : '';
+  if(d.length<=6) return `(${d.slice(0,2)}) ${d.slice(2)}`;
+  if(d.length<=10) return `(${d.slice(0,2)}) ${d.slice(2,6)}-${d.slice(6)}`;
+  return `(${d.slice(0,2)}) ${d.slice(2,7)}-${d.slice(7)}`;
+}
+// nomes do campo morador -> lista (para telefones)
+function nomesDoMorador(mor){
+  return String(mor||'').split('/').map(s=>s.trim()).filter(Boolean);
+}
 
-/* =================== UI: EDITOR DE BLOCO =================== */
-const FIELDS = [['ap','AP','apf'],['mor','Morador','mor'],['prop','Proprietário','prop'],['vei','Veículo','vei'],['pla','Placa','pla']];
+/* =================== EDITOR DE BLOCO =================== */
+function cardHTML(bi, i){
+  const r = S.blocos[bi].rows[i];
+  const up = S.settings.upper ? ' up' : '';
+  const inp = (k, cls='', extra='') => `<input class="${cls}${up}" data-k="${k}" value="${esc(r[k])}" autocomplete="off" spellcheck="false" ${extra}>`;
+  const tels = r.tels.map((t,j)=>`
+    <div class="li tel" data-list="tels" data-j="${j}">
+      <input class="${up}" data-k="nome" value="${esc(t.nome)}" placeholder="Nome" autocomplete="off" spellcheck="false">
+      <input class="${up}" data-k="rel" value="${esc(t.rel)}" placeholder="Parentesco" autocomplete="off" spellcheck="false">
+      <input data-k="tel" value="${esc(t.tel)}" placeholder="Telefone" type="tel" inputmode="tel" autocomplete="off">
+      <button class="ib del" data-rm="tels" title="Tirar contato" aria-label="Tirar contato">${IC.x}</button>
+    </div>`).join('');
+  const veics = r.veics.map((v,j)=>`
+    <div class="li vei" data-list="veics" data-j="${j}">
+      <input class="${up}" data-k="carro" value="${esc(v.carro)}" placeholder="Veículo e cor" autocomplete="off" spellcheck="false">
+      <input class="${up}" data-k="placa" value="${esc(v.placa)}" placeholder="Placa" autocomplete="off" spellcheck="false">
+      <input class="${up}" data-k="vaga" value="${esc(v.vaga)}" placeholder="Vaga do ap" autocomplete="off" spellcheck="false">
+      <button class="ib del" data-rm="veics" title="Tirar veículo" aria-label="Tirar veículo">${IC.x}</button>
+    </div>`).join('');
+  const temNomes = nomesDoMorador(r.mor).length > 0;
+  return `
+  <div class="apt" data-i="${i}">
+    <div class="apt-top">
+      <div class="f apf"><span class="lbl">AP</span>${inp('ap','ap','inputmode="numeric"')}</div>
+      <div class="f mor"><span class="lbl">Morador</span>${inp('mor')}</div>
+      <div class="f prop"><span class="lbl">Proprietário</span>${inp('prop')}</div>
+      <div class="f ptel"><span class="lbl">Tel. proprietário</span><input data-k="propTel" value="${esc(r.propTel)}" type="tel" inputmode="tel" placeholder="(21) 99999-9999" autocomplete="off"></div>
+      <div class="rowbtns">
+        <button class="ib" data-act="up" title="Subir" aria-label="Subir">${IC.up}</button>
+        <button class="ib" data-act="down" title="Descer" aria-label="Descer">${IC.down}</button>
+        <button class="ib del" data-act="del" title="Apagar apartamento" aria-label="Apagar apartamento">${IC.del}</button>
+      </div>
+    </div>
+    <div class="apt-sub">
+      <div class="sub">
+        <div class="subh"><b>${IC.phone}Contatos dos moradores</b><button class="btn mini" data-addl="tels">+ Contato</button></div>
+        ${tels || `<div class="empty">Nenhum contato.${temNomes?` <button class="btn mini" data-fromnames>Criar com os nomes do morador</button>`:''}</div>`}
+      </div>
+      <div class="sub">
+        <div class="subh"><b>${IC.car}Veículos</b><button class="btn mini" data-addl="veics">+ Veículo</button></div>
+        ${veics || `<div class="empty">Nenhum veículo.</div>`}
+      </div>
+    </div>
+  </div>`;
+}
 function buildBlock(bi){
   const el = document.getElementById('p-b'+bi);
   const b = S.blocos[bi];
-  const up = S.settings.upper ? ' up' : '';
   el.innerHTML = `
     <div class="bar">
-      <div class="search">${IC.search}<input type="search" placeholder="Procurar apartamento, morador, carro, placa…" data-search="${bi}"></div>
+      <div class="search">${IC.search}<input type="search" placeholder="Procurar apartamento, morador, telefone, carro, placa…" data-search="${bi}"></div>
       <div class="blocknum">Nº do bloco <input data-bnum="${bi}" value="${esc(b.num)}" inputmode="numeric"></div>
     </div>
     <p class="hint">Dica: escreva entre asteriscos para deixar em negrito, por exemplo <code>*SEM PROPRIETARIO*</code>. Texto comprido diminui sozinho para caber na célula.</p>
-    <div class="rows">
-      <div class="rh"><div>AP</div><div>Morador</div><div>Proprietário</div><div>Veículo</div><div>Placa</div><div></div></div>
-      ${b.rows.map((r,i)=>`
-        <div class="row" data-i="${i}">
-          ${FIELDS.map(([k,l,c])=>`<div class="f ${c}"><span class="lbl">${l}</span><input class="${k==='ap'?'ap':''}${up}" data-k="${k}" value="${esc(r[k])}" ${k==='ap'?'inputmode="numeric"':''} autocomplete="off" autocapitalize="characters" spellcheck="false"></div>`).join('')}
-          <div class="rowbtns">
-            <button class="ib" data-act="up" title="Subir" aria-label="Subir">${IC.up}</button>
-            <button class="ib" data-act="down" title="Descer" aria-label="Descer">${IC.down}</button>
-            <button class="ib del" data-act="del" title="Apagar linha" aria-label="Apagar linha">${IC.del}</button>
-          </div>
-        </div>`).join('')}
-    </div>
+    <div class="cards">${b.rows.map((_,i)=>cardHTML(bi,i)).join('')}</div>
     <div class="addrow"><button class="btn light" data-add="${bi}">+ Adicionar apartamento</button></div>`;
+}
+function rebuildCard(bi, i, focusSel){
+  const el = document.querySelector(`#p-b${bi} .apt[data-i="${i}"]`);
+  if(!el) return buildBlock(bi);
+  el.outerHTML = cardHTML(bi, i);
+  if(focusSel){ const f = document.querySelector(`#p-b${bi} .apt[data-i="${i}"] ${focusSel}`); if(f) f.focus(); }
 }
 function wireBlock(bi){
   const el = document.getElementById('p-b'+bi);
   el.addEventListener('input', e=>{
     const t = e.target;
     if(t.dataset.k){
+      const card = t.closest('.apt'), i = +card.dataset.i, r = S.blocos[bi].rows[i];
+      const li = t.closest('.li');
+      const k = t.dataset.k;
       let v = t.value;
-      if(S.settings.upper){ const p=t.selectionStart; v=v.toLocaleUpperCase('pt-BR'); if(v!==t.value){t.value=v; try{t.setSelectionRange(p,p)}catch(_){}} }
-      const i = +t.closest('.row').dataset.i;
-      S.blocos[bi].rows[i][t.dataset.k] = v; save();
+      if(k==='tel' || k==='propTel'){ v = fmtTel(v); if(v!==t.value) t.value = v; }
+      else if(S.settings.upper){ const p=t.selectionStart; v=v.toLocaleUpperCase('pt-BR'); if(v!==t.value){t.value=v; try{t.setSelectionRange(p,p)}catch(_){}} }
+      if(li) r[li.dataset.list][+li.dataset.j][k] = v;
+      else r[k] = v;
+      save();
     } else if(t.dataset.bnum!==undefined){
       S.blocos[bi].num = t.value; save();
       document.querySelector(`#tabs [data-t="b${bi}"]`).textContent = 'Bloco ' + (+t.value || t.value);
     } else if(t.dataset.search!==undefined){
       const q = t.value.trim().toLocaleLowerCase('pt-BR');
-      el.querySelectorAll('.row').forEach(row=>{
-        const r = S.blocos[bi].rows[+row.dataset.i];
-        const hay = Object.values(r).join(' ').toLocaleLowerCase('pt-BR');
-        row.style.display = !q || hay.includes(q) ? '' : 'none';
+      el.querySelectorAll('.apt').forEach(card=>{
+        const r = S.blocos[bi].rows[+card.dataset.i];
+        const hay = JSON.stringify(r).toLocaleLowerCase('pt-BR');
+        card.style.display = !q || hay.includes(q) ? '' : 'none';
       });
     }
   });
   el.addEventListener('click', e=>{
+    const rows = S.blocos[bi].rows;
     const add = e.target.closest('[data-add]');
     if(add){
-      const rows = S.blocos[bi].rows;
       const last = rows[rows.length-1];
-      rows.push(R(last ? String((+last.ap||0)+1) : '101','',''));
+      rows.push(normRow({ap: last ? String((+last.ap||0)+1) : '101', mor:'', prop:''}));
       save(); buildBlock(bi);
-      const inp = el.querySelectorAll('.row')[rows.length-1].querySelector('[data-k="mor"]');
+      const inp = el.querySelector(`.apt[data-i="${rows.length-1}"] [data-k="mor"]`);
       inp.scrollIntoView({block:'center',behavior:'smooth'}); setTimeout(()=>inp.focus(),300);
       return;
     }
+    const card = e.target.closest('.apt'); if(!card) return;
+    const i = +card.dataset.i, r = rows[i];
+
+    const addl = e.target.closest('[data-addl]');
+    if(addl){
+      const L = addl.dataset.addl;
+      r[L].push(L==='tels' ? {nome:'',rel:'',tel:''} : {carro:'',placa:'',vaga:''});
+      save(); rebuildCard(bi, i, `.li[data-list="${L}"][data-j="${r[L].length-1}"] input`);
+      return;
+    }
+    if(e.target.closest('[data-fromnames]')){
+      r.tels = nomesDoMorador(r.mor).map(n=>({nome:n, rel:'', tel:''}));
+      save(); rebuildCard(bi, i, `.li[data-list="tels"] [data-k="tel"]`);
+      return;
+    }
+    const rm = e.target.closest('[data-rm]');
+    if(rm){
+      const li = rm.closest('.li'), L = rm.dataset.rm, j = +li.dataset.j;
+      const it = r[L][j];
+      const temDado = Object.values(it).some(x=>String(x).trim());
+      if(temDado && !confirm(L==='tels' ? `Tirar o contato ${it.nome||''}?` : `Tirar o veículo ${it.carro||''}?`)) return;
+      r[L].splice(j,1); save(); rebuildCard(bi, i);
+      return;
+    }
     const b = e.target.closest('[data-act]'); if(!b) return;
-    const i = +b.closest('.row').dataset.i, rows = S.blocos[bi].rows;
     if(b.dataset.act==='del'){
-      const r = rows[i];
-      if(!confirm(`Apagar a linha do apartamento ${r.ap || '(sem número)'}?`)) return;
+      if(!confirm(`Apagar o apartamento ${r.ap || '(sem número)'} com todos os contatos e veículos?`)) return;
       rows.splice(i,1);
     } else {
       const j = b.dataset.act==='up' ? i-1 : i+1;
@@ -410,12 +562,12 @@ function wireBlock(bi){
   });
 }
 
-/* =================== UI: CABEÇALHOS E AJUSTES =================== */
+/* =================== CABEÇALHOS E AJUSTES =================== */
 function fillCfg(){
   document.querySelectorAll('[data-c]').forEach(inp=>{
     const v = getPath(inp.dataset.c);
     if(inp.type==='checkbox') inp.checked = !!v;
-    else inp.value = inp.dataset.lines ? v.join('\n') : v;
+    else inp.value = inp.dataset.lines ? (v||[]).join('\n') : (v ?? '');
   });
 }
 document.addEventListener('input', e=>{
@@ -432,24 +584,24 @@ document.addEventListener('input', e=>{
 document.addEventListener('change', e=>{ if(e.target.type==='checkbox' && e.target.dataset.c) e.target.dispatchEvent(new Event('input',{bubbles:true})); });
 function setSub(){ document.getElementById('subt').textContent = (S.cab.titulo||'Condomínio').toLocaleLowerCase('pt-BR').replace(/(^|\s)\S/g,m=>m.toUpperCase()); }
 
-/* =================== LAYOUT DA FOLHA (em mm) =================== */
-const PW = 297, PH = 210, PT = 25.4/72;     // 1pt em mm
+/* =================== MOTOR DE LAYOUT (mm) =================== */
+const PT = 25.4/72;
 const FONT = 'Arial, Helvetica, "Liberation Sans", Arimo, sans-serif';
 const mctx = document.createElement('canvas').getContext('2d');
+function dims(mode){ return S.settings.orient[mode]==='portrait' ? [210,297] : [297,210]; }
 function segW(segs, size){
   let w = 0;
   for(const s of segs){ mctx.font = `${s.b?'bold ':''}${size}pt ${FONT}`; w += mctx.measureText(s.s).width; }
   return w * 25.4/96;
 }
-// texto -> pedaços com/sem negrito. *x* = negrito; (x) = negrito se ligado
+// *x* = negrito; (x) = negrito se ligado
 function segs(str, base=false, paren=false){
   str = String(str??'');
   const out=[]; let cur='', star=false, depth=0, curB=null;
   const push = ()=>{ if(cur){ out.push({s:cur,b:curB}); cur=''; } };
   for(const ch of str){
     if(ch==='*'){ star=!star; continue; }
-    let opening = paren && ch==='(';
-    if(opening) depth++;
+    if(paren && ch==='(') depth++;
     const b = base || star || (paren && depth>0);
     if(b!==curB){ push(); curB=b; }
     cur+=ch;
@@ -463,94 +615,213 @@ function fit(sg, size, maxW, min=4.5){
 }
 function T(ops, x,y,w,h, sg, size, align='left', o={}){
   const pad = o.pad ?? 0;
-  const s = o.nofit ? size : fit(sg, size, w-2*pad, o.min);
+  const s = fit(sg, size, w-2*pad, o.min);
   ops.push({t:'text', x:x+pad, y, w:w-2*pad, h, segs:sg, size:s, align, u:!!o.u});
 }
+const line = (ops,x1,y1,x2,y2,lw=0.22)=>ops.push({t:'line',x1,y1,x2,y2,lw});
 
-const COLS = [['BLOCO',.063],['AP',.037],['MORADOR',.264],['PROPRIETARIO',.183],['VEÍCULO',.257],['PLACA',.196]];
-function layout(pi){
-  const st = S.settings, ops = [];
-  const x0 = st.ml, W = PW - st.ml - st.mr;
-  let y = st.mt;
+// texto do veículo / placa para a planilha geral
+function veiTexto(r){
+  return r.veics.map(v=> v.vaga ? `(VAGA ALUG) ${v.carro} ${v.vaga}`.replace(/\s+/g,' ').trim() : v.carro).filter(s=>s.trim()).join(' / ');
+}
+const plaTexto = r => r.veics.map(v=>v.placa).filter(s=>s.trim()).join(' / ');
 
-  if(pi===0){
-    const c = S.cab;
-    T(ops, x0, y, W, 7, segs(c.titulo,true), 15, 'center'); y += 8.2;
-    T(ops, x0, y, W*0.53, 3.8, segs(c.notaEsq,true), 7.5, 'left', {u:true});
-    T(ops, x0+W*0.55, y, W*0.45, 3.8, segs(c.notaDir,true), 7.5, 'right', {u:true}); y += 4.1;
-    T(ops, x0+W*0.45, y, W*0.55, 3.8, segs((c.endereco||'') + (c.cep ? '          ' + c.cep : ''),true), 7.5, 'right'); y += 4.6;
-  } else {
-    const it = S.inter, lh = 2.95, labW = 29;
-    T(ops, x0+1, y, labW-2, 4, segs(it.titulo,true), 9.5, 'left');
-    (it.extras||[]).slice(0,5).forEach((s,i)=> T(ops, x0+1, y+4.2+i*3.2, labW-2, 3.2, segs(s), 7.3, 'left'));
-    ops.push({t:'line', x1:x0+labW, y1:y, x2:x0+labW, y2:y+7*lh, lw:0.25});
-    const cx = x0+labW+1.2, colW = (W-labW-1.2)/4;
-    (it.itens||[]).slice(0,28).forEach((s,i)=>{
-      const c = Math.floor(i/7), r = i%7;
-      T(ops, cx+c*colW, y+r*lh, colW-1.5, lh, segs(s), 7.2, 'left');
+/* ---------- Modelo 1: planilha geral ---------- */
+const COLS_G = [['BLOCO',.063],['AP',.037],['MORADOR',.264],['PROPRIETARIO',.183],['VEÍCULO',.257],['PLACA',.196]];
+function pagesGeral(){
+  const [PW,PH] = dims('geral'), st = S.settings;
+  return S.blocos.map((b,pi)=>{
+    const ops = [];
+    const x0 = st.ml, W = PW - st.ml - st.mr;
+    let y = st.mt;
+    if(pi===0){
+      const c = S.cab, port = PW<PH;
+      T(ops, x0, y, W, 7, segs(c.titulo,true), 15, 'center'); y += 8.2;
+      if(port){
+        T(ops, x0, y, W, 3.8, segs(c.notaEsq,true), 7.5, 'left', {u:true}); y += 4.1;
+        T(ops, x0, y, W, 3.8, segs(c.notaDir,true), 7.5, 'left', {u:true}); y += 4.1;
+      } else {
+        T(ops, x0, y, W*0.53, 3.8, segs(c.notaEsq,true), 7.5, 'left', {u:true});
+        T(ops, x0+W*0.55, y, W*0.45, 3.8, segs(c.notaDir,true), 7.5, 'right', {u:true}); y += 4.1;
+      }
+      T(ops, x0+W*0.4, y, W*0.6, 3.8, segs((c.endereco||'') + (c.cep ? '          ' + c.cep : ''),true), 7.5, 'right'); y += 4.6;
+    } else {
+      const it = S.inter, lh = 2.95, labW = 29;
+      T(ops, x0+1, y, labW-2, 4, segs(it.titulo,true), 9.5, 'left');
+      (it.extras||[]).slice(0,5).forEach((s,i)=> T(ops, x0+1, y+4.2+i*3.2, labW-2, 3.2, segs(s), 7.3, 'left'));
+      line(ops, x0+labW, y, x0+labW, y+7*lh, 0.25);
+      const cx = x0+labW+1.2, colW = (W-labW-1.2)/4;
+      (it.itens||[]).slice(0,28).forEach((s,i)=>{
+        const c = Math.floor(i/7), r = i%7;
+        T(ops, cx+c*colW, y+r*lh, colW-1.5, lh, segs(s), 7.2, 'left');
+      });
+      y += 7*lh + 2.2;
+    }
+    const n = Math.max(1, b.rows.length), headH = 4.6;
+    const rowH = Math.min(7, (PH - st.mb - y - headH) / n);
+    const tH = headH + rowH*b.rows.length;
+    const xs = [x0]; COLS_G.forEach(([,f])=>xs.push(xs[xs.length-1]+f*W));
+    ops.push({t:'rect', x:x0, y, w:W, h:headH, fill:'#d0d0d0'});
+    COLS_G.forEach(([lab],i)=> T(ops, xs[i], y, xs[i+1]-xs[i], headH, segs(lab,true), 8, 'center', {pad:0.6}));
+    const fs = st.fonte, P = st.paren;
+    b.rows.forEach((r,i)=>{
+      const ry = y + headH + i*rowH;
+      [[b.num,true,'center'],[r.ap,true,'center'],[r.mor,false,'left'],[r.prop,false,'left'],[veiTexto(r),true,'center'],[plaTexto(r),true,'center']]
+        .forEach(([v,bold,al],c)=> T(ops, xs[c], ry, xs[c+1]-xs[c], rowH, segs(v,bold,P), fs, al, {pad:0.9}));
     });
-    y += 7*lh + 2.2;
-  }
-
-  // tabela
-  const b = S.blocos[pi], n = Math.max(1, b.rows.length);
-  const headH = 4.6;
-  const avail = PH - st.mb - y - headH;
-  const rowH = Math.min(7, avail / n);
-  const tH = headH + rowH*b.rows.length;
-  const xs = [x0]; COLS.forEach(([,f])=>xs.push(xs[xs.length-1]+f*W));
-  ops.push({t:'rect', x:x0, y, w:W, h:headH, fill:'#d0d0d0'});
-  COLS.forEach(([lab],i)=> T(ops, xs[i], y, xs[i+1]-xs[i], headH, segs(lab,true), 8, 'center', {pad:0.6}));
-  const fs = st.fonte, P = st.paren;
-  b.rows.forEach((r,i)=>{
-    const ry = y + headH + i*rowH;
-    const cells = [
-      [b.num, true, 'center'], [r.ap, true, 'center'],
-      [r.mor, false, 'left'], [r.prop, false, 'left'],
-      [r.vei, true, 'center'], [r.pla, true, 'center']
-    ];
-    cells.forEach(([v,bold,al],c)=> T(ops, xs[c], ry, xs[c+1]-xs[c], rowH, segs(v,bold,P), fs, al, {pad:0.9}));
+    ops.push({t:'rect', x:x0, y, w:W, h:tH, stroke:true, lw:0.35});
+    for(let i=0;i<=b.rows.length;i++){ const ly = y+headH+i*rowH; line(ops,x0,ly,x0+W,ly); }
+    for(let i=1;i<COLS_G.length;i++) line(ops,xs[i],y,xs[i],y+tH);
+    return {w:PW, h:PH, ops};
   });
-  // grade
-  const lw = 0.22;
-  ops.push({t:'rect', x:x0, y, w:W, h:tH, stroke:true, lw:0.35});
-  for(let i=0;i<=b.rows.length;i++){ const ly = y+headH+i*rowH; ops.push({t:'line',x1:x0,y1:ly,x2:x0+W,y2:ly,lw}); }
-  for(let i=1;i<COLS.length;i++) ops.push({t:'line',x1:xs[i],y1:y,x2:xs[i],y2:y+tH,lw});
-  return ops;
 }
 
+/* ---------- Modelos 2 e 3: tabelas agrupadas por apartamento ---------- */
+// cols: {lab, f, m(merged), al, b(bold)}; units: [{k, vals:[string | array]}]
+function pagesAgrupadas(mode, sub, cols, unitsOf){
+  const [PW,PH] = dims(mode), st = S.settings;
+  const x0 = st.ml, W = PW - st.ml - st.mr;
+  const headH = 4.8, rowH = Math.max(4.2, st.fonte*0.6);
+  const xs = [x0]; cols.forEach(c=>xs.push(xs[xs.length-1]+c.f*W));
+  const pages = [];
+
+  S.blocos.forEach(b=>{
+    const units = unitsOf(b);
+    let pg = null, y, used, zi = 0;
+    const startPage = ()=>{
+      pg = {w:PW, h:PH, ops:[], fills:[], lines:[], blk:b.num};
+      pages.push(pg);
+      const c = S.cab, ops = pg.ops;
+      y = st.mt;
+      T(ops, x0, y, W, 7, segs(c.titulo,true), 15, 'center'); y += 8.4;
+      const left = `${sub}  ·  BLOCO ${b.num}`;
+      T(ops, x0, y, W*0.5, 4.2, segs(left,true), 9.5, 'left');
+      T(ops, x0+W*0.5, y, W*0.5, 4.2, segs('', true), 7.5, 'right'); // placeholder p/ nº da folha
+      pg.folhaOp = ops[ops.length-1];
+      y += 5.2;
+      if(c.endereco || c.cep){
+        T(ops, x0, y-0.6, W, 3.4, segs([c.endereco, c.cep].filter(Boolean).join('     '), false), 7, 'left');
+        y += 3.4;
+      }
+      y += 0.6;
+      pg.top = y;
+      pg.fills.push({t:'rect', x:x0, y, w:W, h:headH, fill:'#d0d0d0'});
+      cols.forEach((c,i)=> T(ops, xs[i], y, xs[i+1]-xs[i], headH, segs(c.lab,true), 8, 'center', {pad:0.6}));
+      y += headH; used = 0;
+      pg.lim = PH - st.mb;
+    };
+    const closePage = ()=>{
+      const ops = pg.lines, tB = y;
+      ops.push({t:'rect', x:x0, y:pg.top, w:W, h:tB-pg.top, stroke:true, lw:0.35});
+      line(ops, x0, pg.top+headH, x0+W, pg.top+headH);
+      for(let i=1;i<cols.length;i++) line(ops, xs[i], pg.top, xs[i], tB);
+    };
+    startPage();
+    units.forEach(u=>{
+      const h = u.k*rowH;
+      if(y + h > pg.lim + 0.01 && used>0){ closePage(); startPage(); }
+      const ops = pg.ops, P = st.paren, fs = st.fonte;
+      if(st.zebra && (zi++ % 2)) pg.fills.push({t:'rect', x:x0, y, w:W, h, fill:'#efefef'});
+      cols.forEach((c,ci)=>{
+        const v = u.vals[ci], cw = xs[ci+1]-xs[ci];
+        if(c.m) T(ops, xs[ci], y, cw, h, segs(v, c.b, P), fs, c.al, {pad:0.9});
+        else for(let s=0;s<u.k;s++) T(ops, xs[ci], y+s*rowH, cw, rowH, segs((v||[])[s]||'', c.b, P), fs, c.al, {pad:0.9});
+      });
+      // linhas internas só nas colunas que não são mescladas
+      for(let s=1;s<u.k;s++){
+        const ly = y + s*rowH;
+        cols.forEach((c,ci)=>{ if(!c.m) line(pg.lines, xs[ci], ly, xs[ci+1], ly, 0.14); });
+      }
+      y += h; used++;
+      line(pg.lines, x0, y, x0+W, y, 0.22);
+    });
+    closePage();
+  });
+  // nº da folha por bloco
+  const porBloco = {};
+  pages.forEach(p=>{ (porBloco[p.blk] = porBloco[p.blk] || []).push(p); });
+  Object.values(porBloco).forEach(list=> list.forEach((p,i)=>{
+    const o = p.folhaOp; o.segs = segs(`Folha ${i+1} de ${list.length}`, false); o.size = 7.5;
+  }));
+  return pages.map(p=>({w:p.w, h:p.h, ops:[...p.fills, ...p.ops, ...p.lines]}));
+}
+
+function pagesTel(){
+  const cols = [
+    {lab:'BLOCO',f:.06,m:1,al:'center',b:1},{lab:'AP',f:.05,m:1,al:'center',b:1},
+    {lab:'MORADOR',f:.25,al:'left'},{lab:'PARENTESCO',f:.11,al:'center'},{lab:'TELEFONE',f:.15,al:'center',b:1},
+    {lab:'PROPRIETÁRIO',f:.21,m:1,al:'left'},{lab:'TEL. PROPRIETÁRIO',f:.17,m:1,al:'center',b:1}
+  ];
+  return pagesAgrupadas('tel', S.cab.subTel || 'TELEFONES DOS MORADORES', cols, b=> b.rows.map(r=>{
+    let list = r.tels.length ? r.tels : nomesDoMorador(r.mor).map(n=>({nome:n,rel:'',tel:''}));
+    if(!list.length) list = [{nome:'',rel:'',tel:''}];
+    return {k:list.length, vals:[b.num, r.ap, list.map(t=>t.nome), list.map(t=>UP(t.rel)), list.map(t=>t.tel), r.prop, r.propTel]};
+  }));
+}
+function pagesVeic(){
+  const cols = [
+    {lab:'BLOCO',f:.06,m:1,al:'center',b:1},{lab:'AP',f:.05,m:1,al:'center',b:1},
+    {lab:'MORADOR',f:.30,m:1,al:'left'},
+    {lab:'VEÍCULO',f:.27,al:'center',b:1},{lab:'PLACA',f:.13,al:'center',b:1},{lab:'VAGA ALUGADA (AP)',f:.19,al:'center',b:1}
+  ];
+  return pagesAgrupadas('veic', S.cab.subVeic || 'VEÍCULOS DOS MORADORES', cols, b=> b.rows
+    .filter(r=> S.settings.veicTodos || r.veics.some(v=>Object.values(v).some(x=>String(x).trim())))
+    .map(r=>{
+      const list = r.veics.length ? r.veics : [{carro:'',placa:'',vaga:''}];
+      return {k:list.length, vals:[b.num, r.ap, r.mor, list.map(v=>v.carro), list.map(v=>v.placa), list.map(v=>v.vaga)]};
+    }));
+}
+const MODOS = {
+  geral:{nome:'Planilha geral', pages:pagesGeral, nota:'Uma folha por bloco, com moradores, proprietários e veículos.'},
+  tel:{nome:'Telefones', pages:pagesTel, nota:'Cada bloco começa numa folha nova. Se faltar espaço, continua na folha seguinte. Apartamento sem contato cadastrado sai com os nomes do morador e o telefone em branco, para preencher à mão.'},
+  veic:{nome:'Veículos', pages:pagesVeic, nota:'Cada bloco começa numa folha nova. Um veículo por linha, com a vaga alugada de outro apartamento quando houver.'}
+};
+
 /* =================== DESENHO NA TELA / IMPRESSÃO =================== */
-function sheetHTML(pi){
-  const ops = layout(pi);
-  let svg = `<svg viewBox="0 0 ${PW} ${PH}" xmlns="http://www.w3.org/2000/svg">`, tx = '';
-  for(const o of ops){
+function sheetHTML(p, printH){
+  let svg = `<svg viewBox="0 0 ${p.w} ${p.h}" style="width:${p.w}mm;height:${p.h}mm" xmlns="http://www.w3.org/2000/svg">`, tx = '';
+  for(const o of p.ops){
     if(o.t==='rect'){
       svg += `<rect x="${o.x}" y="${o.y}" width="${o.w}" height="${o.h}" fill="${o.fill||'none'}" ${o.stroke?`stroke="#000" stroke-width="${o.lw}"`:''}/>`;
     } else if(o.t==='line'){
       svg += `<line x1="${o.x1}" y1="${o.y1}" x2="${o.x2}" y2="${o.y2}" stroke="#000" stroke-width="${o.lw}"/>`;
     } else {
+      if(!o.segs.length) continue;
       const jc = o.align==='center'?'center':o.align==='right'?'flex-end':'flex-start';
       const inner = o.segs.map(s=>{ const t=esc(s.s); return s.b?`<b>${t}</b>`:t; }).join('');
       tx += `<div class="tx" style="left:${o.x}mm;top:${o.y}mm;width:${o.w}mm;height:${o.h}mm;font-size:${o.size.toFixed(2)}pt;justify-content:${jc}"><span${o.u?' class="u"':''}>${inner}</span></div>`;
     }
   }
-  return `<div class="sheet">${svg}</svg>${tx}</div>`;
+  return `<div class="sheet" style="width:${p.w}mm;height:${printH ? p.h-0.5 : p.h}mm">${svg}</svg>${tx}</div>`;
 }
-function renderPrint(){ document.getElementById('printArea').innerHTML = S.blocos.map((_,i)=>sheetHTML(i)).join(''); }
+function modoAtual(){ return S.ui.modo in MODOS ? S.ui.modo : 'geral'; }
+function renderPrint(){
+  const m = modoAtual();
+  document.getElementById('pgsize').textContent = `@page{size:A4 ${S.settings.orient[m]};margin:0}`;
+  document.getElementById('printArea').innerHTML = MODOS[m].pages().map(p=>sheetHTML(p,true)).join('');
+}
 
-let pvDirty = true;
+let pvDirty = true, pvModo = null;
 function renderPreview(){
-  const box = document.getElementById('pvSheets');
-  if(pvDirty){ box.innerHTML = S.blocos.map((_,i)=>`<div class="pvwrap">${sheetHTML(i)}</div>`).join(''); pvDirty=false; }
+  const m = modoAtual(), box = document.getElementById('pvSheets');
+  document.querySelectorAll('#segModo button').forEach(b=>b.classList.toggle('on', b.dataset.m===m));
+  if(pvDirty || pvModo!==m){
+    const pages = MODOS[m].pages();
+    box.innerHTML = pages.map(p=>`<div class="pvwrap" data-w="${p.w}" data-h="${p.h}">${sheetHTML(p)}</div>`).join('');
+    document.getElementById('pvNote').textContent = `${MODOS[m].nota} Total: ${pages.length} folha${pages.length>1?'s':''} A4.`;
+    pvDirty = false; pvModo = m;
+  }
   scalePreview();
 }
 function scalePreview(){
   const box = document.getElementById('pvSheets');
   const avail = Math.min(box.clientWidth, 1150);
-  const sheetPx = PW * 96/25.4, k = avail / sheetPx;
+  const px = 96/25.4, k = avail / (297*px);
   box.querySelectorAll('.pvwrap').forEach(w=>{
-    w.style.width = avail+'px'; w.style.height = (PH*96/25.4*k)+'px';
-    w.firstElementChild.style.transform = `scale(${k})`;
+    const pw = +w.dataset.w, ph = +w.dataset.h;
+    const kk = pw<ph ? Math.min(k*1.25, avail/(pw*px)) : k;
+    w.style.width = (pw*px*kk)+'px'; w.style.height = (ph*px*kk)+'px';
+    w.firstElementChild.style.transform = `scale(${kk})`;
   });
 }
 addEventListener('resize', ()=>{ if(cur==='pv') scalePreview(); });
@@ -559,26 +830,25 @@ addEventListener('resize', ()=>{ if(cur==='pv') scalePreview(); });
 function hexRGB(h){ h=h.replace('#',''); return [0,2,4].map(i=>parseInt(h.substr(i,2),16)); }
 function makePDF(){
   const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({orientation:'landscape', unit:'mm', format:'a4', compress:true});
-  doc.setProperties({title:'ADM Morador - ' + (S.cab.titulo||''), creator:'ADM Morador'});
-  doc.setLineCap('butt');
-  S.blocos.forEach((_,pi)=>{
-    if(pi) doc.addPage('a4','landscape');
-    const ops = layout(pi);
-    for(const o of ops){
+  const m = modoAtual(), orient = S.settings.orient[m];
+  const doc = new jsPDF({orientation:orient, unit:'mm', format:'a4', compress:true});
+  doc.setProperties({title:`ADM Morador - ${MODOS[m].nome} - ${S.cab.titulo||''}`, creator:'ADM Morador'});
+  MODOS[m].pages().forEach((p,pi)=>{
+    if(pi) doc.addPage('a4', orient);
+    for(const o of p.ops){
       if(o.t==='rect'){
-        if(o.fill){ doc.setFillColor(...hexRGB(o.fill)); }
+        if(o.fill) doc.setFillColor(...hexRGB(o.fill));
         if(o.stroke){ doc.setDrawColor(0); doc.setLineWidth(o.lw); }
         doc.rect(o.x,o.y,o.w,o.h, o.fill&&o.stroke?'FD':o.fill?'F':'S');
       } else if(o.t==='line'){
         doc.setDrawColor(0); doc.setLineWidth(o.lw); doc.line(o.x1,o.y1,o.x2,o.y2);
       } else {
+        if(!o.segs.length) continue;
         doc.setFontSize(o.size); doc.setTextColor(0);
         const ws = o.segs.map(s=>{ doc.setFont('helvetica', s.b?'bold':'normal'); return doc.getTextWidth(s.s); });
         const total = ws.reduce((a,b)=>a+b,0);
         let x = o.align==='center' ? o.x+(o.w-total)/2 : o.align==='right' ? o.x+o.w-total : o.x;
-        const yc = o.y + o.h/2;
-        const x1 = x;
+        const yc = o.y + o.h/2, x1 = x;
         o.segs.forEach((s,i)=>{ doc.setFont('helvetica', s.b?'bold':'normal'); doc.text(s.s, x, yc, {baseline:'middle'}); x += ws[i]; });
         if(o.u){ doc.setLineWidth(o.size*PT*0.07); const uy = yc + o.size*PT*0.42; doc.line(x1,uy,x,uy); }
       }
@@ -586,24 +856,33 @@ function makePDF(){
   });
   return doc;
 }
-function fileName(ext){
+function fileName(ext, semModo){
   const d = new Date(), p = n=>String(n).padStart(2,'0');
-  const nome = (S.cab.titulo||'condominio').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^\w]+/g,'-').replace(/^-|-$/g,'');
-  return `ADM-Morador_${nome}_${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}.${ext}`;
+  const slug = s => String(s).normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^\w]+/g,'-').replace(/^-|-$/g,'');
+  const modo = semModo ? 'backup' : slug(MODOS[modoAtual()].nome);
+  return `ADM-Morador_${slug(S.cab.titulo||'condominio')}_${modo}_${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}.${ext}`;
 }
 
 /* =================== AÇÕES =================== */
-function toast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('on'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('on'),2200); }
-document.getElementById('bPrint').onclick = ()=>{ renderPrint(); setTimeout(()=>window.print(), 60); };
+function toast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('on'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('on'),2400); }
+document.getElementById('bPrint').onclick = ()=>{ renderPrint(); setTimeout(()=>window.print(), 80); };
 addEventListener('beforeprint', renderPrint);
 document.getElementById('bPdf').onclick = ()=>{
   if(!window.jspdf){ toast('Sem internet para gerar o PDF. Use Imprimir > Salvar como PDF.'); return; }
-  try{ makePDF().save(fileName('pdf')); toast('PDF gerado'); }
+  try{ makePDF().save(fileName('pdf')); toast(`PDF gerado: ${MODOS[modoAtual()].nome}`); }
   catch(e){ console.error(e); toast('Erro ao gerar PDF'); }
 };
+function setModo(m){
+  S.ui.modo = m; save();
+  document.getElementById('selModo').value = m;
+  if(cur==='pv') renderPreview();
+}
+document.getElementById('selModo').onchange = e=> setModo(e.target.value);
+document.getElementById('segModo').onclick = e=>{ const b = e.target.closest('[data-m]'); if(b) setModo(b.dataset.m); };
+
 document.getElementById('bExp').onclick = ()=>{
   const blob = new Blob([JSON.stringify(S,null,1)],{type:'application/json'});
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = fileName('json');
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = fileName('json', true);
   document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),1000);
   toast('Backup exportado');
 };
@@ -613,13 +892,13 @@ document.getElementById('fImp').onchange = async e=>{
   try{
     const d = JSON.parse(await f.text());
     if(!d.blocos) throw 0;
-    S = merge(clone(ORIGINAL), d); save(); refreshAll(); toast('Backup importado');
+    S = merge(fresh(), d); save(); refreshAll(); toast('Backup importado');
   }catch(_){ toast('Arquivo de backup inválido'); }
   e.target.value='';
 };
 document.getElementById('bReset').onclick = ()=>{
-  if(!confirm('Voltar tudo para a planilha original? O que foi editado será perdido.')) return;
-  S = clone(ORIGINAL); save(); refreshAll(); toast('Planilha original restaurada');
+  if(!confirm('Voltar tudo para a planilha original? O que foi editado (inclusive telefones) será perdido.')) return;
+  S = fresh(); save(); refreshAll(); toast('Planilha original restaurada');
 };
 
 /* =================== ABAS =================== */
@@ -635,6 +914,7 @@ document.getElementById('tabs').onclick = e=>{
 
 function refreshAll(){
   buildBlock(0); buildBlock(1); fillCfg(); setSub(); pvDirty = true;
+  document.getElementById('selModo').value = modoAtual();
   S.blocos.forEach((b,i)=>{ const t=document.querySelector(`#tabs [data-t="b${i}"]`); if(t) t.textContent='Bloco '+(+b.num||b.num); });
   if(cur==='pv') renderPreview();
 }
