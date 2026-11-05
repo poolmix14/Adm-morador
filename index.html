@@ -161,6 +161,11 @@ main{max-width:1250px;margin:0 auto;padding:16px 16px calc(40px + env(safe-area-
 .seg button{border:0;background:none;padding:8px 14px;border-radius:8px;font-weight:600;font-size:14px;color:var(--muted)}
 .seg button.on{background:var(--navy);color:#fff}
 .pv-note{font-size:13px;color:var(--muted);margin:0 0 12px}
+.pvbar{display:flex;align-items:center;gap:8px;margin:0 -16px 10px;padding:8px 16px;flex-wrap:wrap;position:sticky;top:calc(var(--hh,120px) - 10px);z-index:10;background:var(--bg)}
+.pvbar .zbtn{width:36px;height:36px;border:0;border-radius:9px;background:#fff;color:var(--navy);font-size:20px;font-weight:700;box-shadow:0 1px 3px rgba(0,0,0,.08);display:grid;place-items:center}
+.pvbar #zVal{min-width:64px;height:36px;border:0;border-radius:9px;background:#fff;color:var(--navy);font-weight:700;font-size:14px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.pvbar .pv-note{margin:0 0 0 4px}
+#pvSheets{overflow-x:auto;overflow-y:hidden;touch-action:pan-x pan-y;-webkit-overflow-scrolling:touch;padding-bottom:4px}
 .pvwrap{margin:0 auto 18px;box-shadow:0 4px 18px rgba(20,33,61,.18);background:#fff;overflow:hidden}
 .pvwrap .sheet{transform-origin:0 0}
 
@@ -228,7 +233,12 @@ main{max-width:1250px;margin:0 auto;padding:16px 16px calc(40px + env(safe-area-
       <button data-m="veic">Veículos</button>
     </div>
     <p class="pv-note" id="pvNote"></p>
-    <p class="pv-note" style="margin-top:-6px">No celular, use dois dedos para dar zoom na folha.</p>
+    <div class="pvbar">
+      <button class="zbtn" id="zMenos" aria-label="Diminuir zoom">−</button>
+      <button id="zVal" title="Voltar ao tamanho normal">100%</button>
+      <button class="zbtn" id="zMais" aria-label="Aumentar zoom">+</button>
+      <span class="pv-note">Zoom só na folha: use dois dedos ou os botões.</span>
+    </div>
     <div id="pvSheets"></div>
   </section>
 
@@ -830,15 +840,60 @@ function renderPreview(){
 function scalePreview(){
   const box = document.getElementById('pvSheets');
   const avail = Math.min(box.clientWidth, 1150);
-  const px = 96/25.4, k = avail / (297*px);
+  const px = 96/25.4, k = avail / (297*px) * pvZoom;
   box.querySelectorAll('.pvwrap').forEach(w=>{
     const pw = +w.dataset.w, ph = +w.dataset.h;
-    const kk = pw<ph ? Math.min(k*1.25, avail/(pw*px)) : k;
+    const kk = pw<ph ? Math.min(k*1.25, avail*pvZoom/(pw*px)) : k;
     w.style.width = (pw*px*kk)+'px'; w.style.height = (ph*px*kk)+'px';
     w.firstElementChild.style.transform = `scale(${kk})`;
   });
 }
 addEventListener('resize', ()=>{ if(cur==='pv') scalePreview(); });
+
+/* ---------- zoom próprio da prévia (a página continua sem zoom) ---------- */
+let pvZoom = 1;
+const ZMIN = 1, ZMAX = 5;
+// muda o zoom mantendo parado o ponto (clientX, clientY) da tela
+function setPvZoom(z, cx, cy){
+  const box = document.getElementById('pvSheets');
+  z = Math.min(ZMAX, Math.max(ZMIN, z));
+  const r = box.getBoundingClientRect();
+  if(cx==null){ cx = r.left + r.width/2; cy = Math.min(innerHeight, r.bottom)/2 + Math.max(0, r.top)/2; }
+  const ratio = z / pvZoom;
+  const px = (box.scrollLeft + cx - r.left) * ratio;          // posição horizontal dentro da folha
+  const pyDoc = (scrollY + cy - (r.top + scrollY)) * ratio;    // posição vertical dentro da área
+  pvZoom = z; scalePreview();
+  box.scrollLeft = px - (cx - r.left);
+  window.scrollTo(0, (r.top + scrollY) + pyDoc - cy);
+  document.getElementById('zVal').textContent = Math.round(z*100) + '%';
+}
+document.getElementById('zMais').onclick = ()=> setPvZoom(pvZoom*1.5);
+document.getElementById('zMenos').onclick = ()=> setPvZoom(pvZoom/1.5);
+document.getElementById('zVal').onclick = ()=> setPvZoom(1);
+(()=>{
+  const box = document.getElementById('pvSheets');
+  let d0 = 0, z0 = 1, lastTap = 0;
+  const dist = t => Math.hypot(t[0].clientX-t[1].clientX, t[0].clientY-t[1].clientY);
+  const mid = t => [(t[0].clientX+t[1].clientX)/2, (t[0].clientY+t[1].clientY)/2];
+  box.addEventListener('touchstart', e=>{
+    if(e.touches.length===2){ d0 = dist(e.touches); z0 = pvZoom; }
+    else if(e.touches.length===1){
+      const now = Date.now();
+      if(now - lastTap < 300){ e.preventDefault(); const t = e.touches[0]; setPvZoom(pvZoom>1.2 ? 1 : 2.5, t.clientX, t.clientY); lastTap = 0; }
+      else lastTap = now;
+    }
+  }, {passive:false});
+  box.addEventListener('touchmove', e=>{
+    if(e.touches.length===2 && d0){
+      e.preventDefault();
+      const [cx,cy] = mid(e.touches);
+      setPvZoom(z0 * dist(e.touches) / d0, cx, cy);
+    }
+  }, {passive:false});
+  box.addEventListener('touchend', e=>{ if(e.touches.length<2) d0 = 0; });
+  // PC: Ctrl + rodinha do mouse
+  box.addEventListener('wheel', e=>{ if(e.ctrlKey){ e.preventDefault(); setPvZoom(pvZoom * (e.deltaY<0 ? 1.15 : 1/1.15), e.clientX, e.clientY); } }, {passive:false});
+})();
 
 /* =================== PDF (vetorial, jsPDF) =================== */
 function hexRGB(h){ h=h.replace('#',''); return [0,2,4].map(i=>parseInt(h.substr(i,2),16)); }
@@ -922,19 +977,12 @@ document.getElementById('bReset').onclick = ()=>{
   S = fresh(); save(); refreshAll(); toast('Planilha original restaurada');
 };
 
-/* =================== ZOOM: travado no app, liberado só na Prévia =================== */
-const VP_FIXO  = 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover';
-const VP_ZOOM  = 'width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes, viewport-fit=cover';
-function setZoom(livre){
-  document.documentElement.classList.toggle('nozoom', !livre);
-  // trocar o viewport também desfaz o zoom que ficou da Prévia
-  document.getElementById('vp').setAttribute('content', livre ? VP_ZOOM : VP_FIXO);
-}
+/* =================== ZOOM DA PÁGINA: sempre travado (a Prévia tem zoom próprio) =================== */
 const semZoom = ()=> document.documentElement.classList.contains('nozoom');
 // iPhone/iPad (Safari ignora user-scalable=no): bloqueia o gesto de pinça
 ['gesturestart','gesturechange','gestureend'].forEach(ev=> document.addEventListener(ev, e=>{ if(semZoom()) e.preventDefault(); }, {passive:false}));
 document.addEventListener('touchmove', e=>{ if(semZoom() && e.touches.length>1) e.preventDefault(); }, {passive:false});
-// toque duplo: o CSS touch-action (pan-x pan-y) já impede o zoom fora da Prévia
+// toque duplo: o CSS touch-action (pan-x pan-y) já impede o zoom da página
 
 /* =================== SENHA DO ADMINISTRADOR =================== */
 // a senha não fica escrita no código: só o resultado de um cálculo sobre ela
@@ -980,7 +1028,6 @@ document.getElementById('tabs').onclick = e=>{
   cur = b.dataset.t;
   document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('on', x===b));
   showPanels();
-  setZoom(cur==='pv');
   if(cur==='pv') renderPreview();
   if(cur==='cfg') showCfg();
   scrollTo({top:0});
