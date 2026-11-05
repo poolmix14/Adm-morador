@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="nozoom">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" id="vp" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#14213d">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="ADM Morador">
@@ -18,6 +18,7 @@
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 [hidden]{display:none!important}
+html.nozoom,html.nozoom body{touch-action:pan-x pan-y}
 html,body{margin:0}
 body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--txt);min-height:100dvh}
 button{font:inherit;cursor:pointer;touch-action:manipulation}
@@ -227,6 +228,7 @@ main{max-width:1250px;margin:0 auto;padding:16px 16px calc(40px + env(safe-area-
       <button data-m="veic">Veículos</button>
     </div>
     <p class="pv-note" id="pvNote"></p>
+    <p class="pv-note" style="margin-top:-6px">No celular, use dois dedos para dar zoom na folha.</p>
     <div id="pvSheets"></div>
   </section>
 
@@ -920,6 +922,20 @@ document.getElementById('bReset').onclick = ()=>{
   S = fresh(); save(); refreshAll(); toast('Planilha original restaurada');
 };
 
+/* =================== ZOOM: travado no app, liberado só na Prévia =================== */
+const VP_FIXO  = 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover';
+const VP_ZOOM  = 'width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes, viewport-fit=cover';
+function setZoom(livre){
+  document.documentElement.classList.toggle('nozoom', !livre);
+  // trocar o viewport também desfaz o zoom que ficou da Prévia
+  document.getElementById('vp').setAttribute('content', livre ? VP_ZOOM : VP_FIXO);
+}
+const semZoom = ()=> document.documentElement.classList.contains('nozoom');
+// iPhone/iPad (Safari ignora user-scalable=no): bloqueia o gesto de pinça
+['gesturestart','gesturechange','gestureend'].forEach(ev=> document.addEventListener(ev, e=>{ if(semZoom()) e.preventDefault(); }, {passive:false}));
+document.addEventListener('touchmove', e=>{ if(semZoom() && e.touches.length>1) e.preventDefault(); }, {passive:false});
+// toque duplo: o CSS touch-action (pan-x pan-y) já impede o zoom fora da Prévia
+
 /* =================== SENHA DO ADMINISTRADOR =================== */
 // a senha não fica escrita no código: só o resultado de um cálculo sobre ela
 const ADM_H = '2d5af0cb';
@@ -964,6 +980,7 @@ document.getElementById('tabs').onclick = e=>{
   cur = b.dataset.t;
   document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('on', x===b));
   showPanels();
+  setZoom(cur==='pv');
   if(cur==='pv') renderPreview();
   if(cur==='cfg') showCfg();
   scrollTo({top:0});
