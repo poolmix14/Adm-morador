@@ -24,11 +24,25 @@ input,textarea,select{font:inherit;font-size:16px;color:var(--txt)}
 
 /* ---------- topo ---------- */
 header.top{position:sticky;top:0;z-index:20;background:var(--navy);color:#fff;padding:calc(env(safe-area-inset-top) + 10px) 16px 0;box-shadow:0 2px 10px rgba(0,0,0,.15)}
-.brand{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.hrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px}
 .brand .logo{width:34px;height:34px;border-radius:9px;background:var(--amber);display:grid;place-items:center;flex:none}
 .brand h1{font-size:18px;margin:0;letter-spacing:.3px}
 .brand small{display:block;font-size:12px;opacity:.7;font-weight:400}
-.actions{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.actions{margin-left:auto;display:flex;gap:8px;align-items:center}
+.finder{display:flex;gap:8px;margin-top:10px;align-items:center}
+.finder .search{flex:1;min-width:0;position:relative}
+.finder .search input{width:100%;padding:9px 10px 9px 34px;border:0;border-radius:10px;background:#fff;font-size:16px}
+.finder .search svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:17px;height:17px;color:var(--muted)}
+.finder .selmodo{flex:none;background-color:#fff;color:var(--navy);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2314213d' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")}
+.finder.off{display:none}
+@media (max-width:640px){
+  .actions{margin-left:0;width:100%}
+  .actions .selmodo{flex:1;min-width:0}
+  .actions .btn{padding:9px 11px;font-size:13.5px;flex:none}
+  .finder .selmodo{padding-right:26px;padding-left:10px;background-position:right 7px center}
+}
+@media (max-width:370px){ .actions .btn svg{display:none} }
 .selmodo{appearance:none;-webkit-appearance:none;border:0;border-radius:10px;padding:9px 30px 9px 12px;font-size:14px;font-weight:600;background:rgba(255,255,255,.12) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 9px center/14px;color:#fff}
 .selmodo option{color:#000}
 .btn{border:0;border-radius:10px;padding:9px 14px;font-weight:600;font-size:14px;display:inline-flex;align-items:center;gap:6px;background:#fff;color:var(--navy)}
@@ -59,7 +73,12 @@ main{max-width:1250px;margin:0 auto;padding:16px 16px calc(40px + env(safe-area-
 .hint code{background:#fff;border:1px solid var(--line);border-radius:5px;padding:0 4px}
 
 .apt{background:var(--card);border-radius:var(--r);box-shadow:0 1px 3px rgba(0,0,0,.07);margin-bottom:12px;padding:12px 14px 14px}
-.apt-top{display:grid;grid-template-columns:84px 2fr 1.3fr 1fr auto;gap:10px;align-items:end}
+.apt{scroll-margin-top:var(--hh,160px);transition:box-shadow .3s}
+.apt.flash{box-shadow:0 0 0 3px var(--amber)}
+.apt-title{display:flex;align-items:baseline;gap:10px;margin-bottom:8px}
+.apt-title .apn{font-size:20px;font-weight:800;color:var(--navy)}
+.apt-title .blk{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
+.apt-top{display:grid;grid-template-columns:2fr 1.3fr 1fr;gap:10px;align-items:end}
 .f{display:flex;flex-direction:column;gap:3px;min-width:0}
 .lbl{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;padding-left:2px}
 .apt input{width:100%;min-width:0;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:#fafbfc;font-size:15px}
@@ -73,6 +92,7 @@ main{max-width:1250px;margin:0 auto;padding:16px 16px calc(40px + env(safe-area-
 .apt-sub{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:12px}
 .sub{background:var(--soft);border-radius:10px;padding:10px}
 .subh{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.subh .btn{white-space:nowrap;flex:none}
 .subh b{font-size:12px;text-transform:uppercase;letter-spacing:.4px;color:var(--navy);margin-right:auto;display:flex;align-items:center;gap:6px}
 .subh b svg{width:15px;height:15px}
 .li{display:grid;gap:6px;margin-bottom:6px;align-items:center}
@@ -83,9 +103,8 @@ main{max-width:1250px;margin:0 auto;padding:16px 16px calc(40px + env(safe-area-
 .addrow{display:flex;justify-content:center;padding:8px 0 12px}
 
 @media (max-width:900px){
-  .apt-top{grid-template-columns:1fr 1fr;grid-template-areas:"ap btn" "mor mor" "prop ptel"}
-  .apt-top .apf{grid-area:ap;max-width:120px}.apt-top .mor{grid-area:mor}.apt-top .prop{grid-area:prop}.apt-top .ptel{grid-area:ptel}
-  .apt-top .rowbtns{grid-area:btn}
+  .apt-top{grid-template-columns:1fr 1fr;grid-template-areas:"mor mor" "prop ptel"}
+  .apt-top .mor{grid-area:mor}.apt-top .prop{grid-area:prop}.apt-top .ptel{grid-area:ptel}
   .apt-sub{grid-template-columns:1fr}
 }
 @media (max-width:520px){
@@ -147,12 +166,14 @@ main{max-width:1250px;margin:0 auto;padding:16px 16px calc(40px + env(safe-area-
 <body>
 
 <header class="top">
-  <div class="brand">
-    <div class="logo"><svg viewBox="0 0 64 64" width="22" height="22"><path d="M14 50V27l18-13 18 13v23H38V36H26v14z" fill="#14213d"/></svg></div>
-    <h1>ADM Morador <small id="subt">Condomínio</small></h1>
+  <div class="hrow">
+    <div class="brand">
+      <div class="logo"><svg viewBox="0 0 64 64" width="22" height="22"><path d="M14 50V27l18-13 18 13v23H38V36H26v14z" fill="#14213d"/></svg></div>
+      <h1>ADM Morador <small id="subt">Condomínio</small></h1>
+    </div>
     <div class="actions">
       <select class="selmodo" id="selModo" aria-label="Modelo de planilha">
-        <option value="geral">Planilha geral</option>
+        <option value="geral">Geral</option>
         <option value="tel">Telefones</option>
         <option value="veic">Veículos</option>
       </select>
@@ -160,9 +181,13 @@ main{max-width:1250px;margin:0 auto;padding:16px 16px calc(40px + env(safe-area-
       <button class="btn amber" id="bPdf"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>Baixar PDF</button>
     </div>
   </div>
+  <div class="finder" id="finder">
+    <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><input type="search" id="q" placeholder="Buscar" autocomplete="off"></div>
+    <select class="selmodo" id="selBloco" aria-label="Bloco"></select>
+    <select class="selmodo" id="selAp" aria-label="Apartamento"></select>
+  </div>
   <nav class="tabs" id="tabs">
-    <button data-t="b0" class="on">Bloco 1</button>
-    <button data-t="b1">Bloco 2</button>
+    <button data-t="mor" class="on">Moradores</button>
     <button data-t="cab">Cabeçalhos</button>
     <button data-t="pv">Prévia</button>
     <button data-t="cfg">Ajustes</button>
@@ -258,7 +283,7 @@ const R = (ap,mor,prop,vei='',pla='') => ({ap,mor,prop,vei,pla});
 const ORIGINAL = {
   settings:{mt:10,mb:9,ml:12,mr:12,fonte:8.5,upper:true,paren:true,zebra:true,veicTodos:true,nTel:4,nVeic:3,
             orient:{geral:'landscape',tel:'landscape',veic:'landscape'}},
-  ui:{modo:'geral'},
+  ui:{modo:'geral',bloco:0},
   cab:{
     titulo:'CONDOMÍNIO ANNECY',
     notaEsq:'Mudanças e uso do elevador para grandes volumes, informar ao Zelador antecipadamente',
@@ -453,16 +478,11 @@ function cardHTML(bi, i){
   const temNomes = nomesDoMorador(r.mor).length > 0;
   return `
   <div class="apt" data-i="${i}">
+    <div class="apt-title"><span class="apn">AP ${esc(r.ap)}</span><span class="blk">Bloco ${esc(S.blocos[bi].num)}</span></div>
     <div class="apt-top">
-      <div class="f apf"><span class="lbl">AP</span>${inp('ap','ap','inputmode="numeric"')}</div>
       <div class="f mor"><span class="lbl">Morador</span>${inp('mor')}</div>
       <div class="f prop"><span class="lbl">Proprietário</span>${inp('prop')}</div>
       <div class="f ptel"><span class="lbl">Tel. proprietário</span><input data-k="propTel" value="${esc(r.propTel)}" type="tel" inputmode="tel" placeholder="(21) 99999-9999" autocomplete="off"></div>
-      <div class="rowbtns">
-        <button class="ib" data-act="up" title="Subir" aria-label="Subir">${IC.up}</button>
-        <button class="ib" data-act="down" title="Descer" aria-label="Descer">${IC.down}</button>
-        <button class="ib del" data-act="del" title="Apagar apartamento" aria-label="Apagar apartamento">${IC.del}</button>
-      </div>
     </div>
     <div class="apt-sub">
       <div class="sub">
@@ -480,13 +500,10 @@ function buildBlock(bi){
   const el = document.getElementById('p-b'+bi);
   const b = S.blocos[bi];
   el.innerHTML = `
-    <div class="bar">
-      <div class="search">${IC.search}<input type="search" placeholder="Procurar apartamento, morador, telefone, carro, placa…" data-search="${bi}"></div>
-      <div class="blocknum">Nº do bloco <input data-bnum="${bi}" value="${esc(b.num)}" inputmode="numeric"></div>
-    </div>
     <p class="hint">Dica: escreva entre asteriscos para deixar em negrito, por exemplo <code>*SEM PROPRIETARIO*</code>. Texto comprido diminui sozinho para caber na célula.</p>
     <div class="cards">${b.rows.map((_,i)=>cardHTML(bi,i)).join('')}</div>
-    <div class="addrow"><button class="btn light" data-add="${bi}">+ Adicionar apartamento</button></div>`;
+`;
+  applySearch();
 }
 function rebuildCard(bi, i, focusSel){
   const el = document.querySelector(`#p-b${bi} .apt[data-i="${i}"]`);
@@ -508,29 +525,10 @@ function wireBlock(bi){
       if(li) r[li.dataset.list][+li.dataset.j][k] = v;
       else r[k] = v;
       save();
-    } else if(t.dataset.bnum!==undefined){
-      S.blocos[bi].num = t.value; save();
-      document.querySelector(`#tabs [data-t="b${bi}"]`).textContent = 'Bloco ' + (+t.value || t.value);
-    } else if(t.dataset.search!==undefined){
-      const q = t.value.trim().toLocaleLowerCase('pt-BR');
-      el.querySelectorAll('.apt').forEach(card=>{
-        const r = S.blocos[bi].rows[+card.dataset.i];
-        const hay = JSON.stringify(r).toLocaleLowerCase('pt-BR');
-        card.style.display = !q || hay.includes(q) ? '' : 'none';
-      });
     }
   });
   el.addEventListener('click', e=>{
     const rows = S.blocos[bi].rows;
-    const add = e.target.closest('[data-add]');
-    if(add){
-      const last = rows[rows.length-1];
-      rows.push(normRow({ap: last ? String((+last.ap||0)+1) : '101', mor:'', prop:''}));
-      save(); buildBlock(bi);
-      const inp = el.querySelector(`.apt[data-i="${rows.length-1}"] [data-k="mor"]`);
-      inp.scrollIntoView({block:'center',behavior:'smooth'}); setTimeout(()=>inp.focus(),300);
-      return;
-    }
     const card = e.target.closest('.apt'); if(!card) return;
     const i = +card.dataset.i, r = rows[i];
 
@@ -555,16 +553,6 @@ function wireBlock(bi){
       r[L].splice(j,1); save(); rebuildCard(bi, i);
       return;
     }
-    const b = e.target.closest('[data-act]'); if(!b) return;
-    if(b.dataset.act==='del'){
-      if(!confirm(`Apagar o apartamento ${r.ap || '(sem número)'} com todos os contatos e veículos?`)) return;
-      rows.splice(i,1);
-    } else {
-      const j = b.dataset.act==='up' ? i-1 : i+1;
-      if(j<0||j>=rows.length) return;
-      [rows[i],rows[j]]=[rows[j],rows[i]];
-    }
-    save(); buildBlock(bi);
   });
 }
 
@@ -881,21 +869,61 @@ document.getElementById('bReset').onclick = ()=>{
   S = fresh(); save(); refreshAll(); toast('Planilha original restaurada');
 };
 
-/* =================== ABAS =================== */
-let cur = 'b0';
+/* =================== ABAS, BUSCA E NAVEGAÇÃO =================== */
+let cur = 'mor';
+const blocoAtual = ()=> Math.min(S.blocos.length-1, Math.max(0, +S.ui.bloco||0));
+function showPanels(){
+  const id = cur==='mor' ? 'p-b'+blocoAtual() : 'p-'+cur;
+  document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('on', p.id===id));
+  document.getElementById('finder').classList.toggle('off', cur!=='mor');
+  setHH();
+}
 document.getElementById('tabs').onclick = e=>{
   const b = e.target.closest('button'); if(!b) return;
   cur = b.dataset.t;
   document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('on', x===b));
-  document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('on', p.id==='p-'+cur));
+  showPanels();
   if(cur==='pv') renderPreview();
   scrollTo({top:0});
 };
+function fillFinder(){
+  const sb = document.getElementById('selBloco'), sa = document.getElementById('selAp'), bi = blocoAtual();
+  sb.innerHTML = S.blocos.map((b,i)=>`<option value="${i}">Bloco ${esc(+b.num||b.num)}</option>`).join('');
+  sb.value = bi;
+  sa.innerHTML = '<option value="">AP</option>' + S.blocos[bi].rows.map((r,i)=>`<option value="${i}">AP ${esc(r.ap)}</option>`).join('');
+}
+function applySearch(){
+  const q = (document.getElementById('q')?.value||'').trim().toLocaleLowerCase('pt-BR');
+  S.blocos.forEach((b,bi)=>{
+    document.querySelectorAll(`#p-b${bi} .apt`).forEach(card=>{
+      const r = b.rows[+card.dataset.i];
+      const hay = JSON.stringify(r).toLocaleLowerCase('pt-BR');
+      card.style.display = !q || hay.includes(q) ? '' : 'none';
+    });
+  });
+}
+document.getElementById('q').addEventListener('input', applySearch);
+document.getElementById('selBloco').onchange = e=>{
+  S.ui.bloco = +e.target.value; save(); fillFinder(); showPanels(); scrollTo({top:0});
+};
+document.getElementById('selAp').onchange = e=>{
+  const v = e.target.value; if(v==='') return;
+  const q = document.getElementById('q'); if(q.value){ q.value=''; applySearch(); }
+  const card = document.querySelector(`#p-b${blocoAtual()} .apt[data-i="${v}"]`);
+  if(card){
+    const hh = document.querySelector('header.top').offsetHeight + 10;
+    window.scrollTo({top: card.getBoundingClientRect().top + window.scrollY - hh, behavior:'smooth'});
+    card.classList.add('flash'); setTimeout(()=>card.classList.remove('flash'), 1400);
+  }
+  e.target.value = '';
+};
+function setHH(){ document.documentElement.style.setProperty('--hh', (document.querySelector('header.top').offsetHeight + 10) + 'px'); }
+addEventListener('resize', setHH);
 
 function refreshAll(){
   buildBlock(0); buildBlock(1); fillCfg(); setSub(); pvDirty = true;
   document.getElementById('selModo').value = modoAtual();
-  S.blocos.forEach((b,i)=>{ const t=document.querySelector(`#tabs [data-t="b${i}"]`); if(t) t.textContent='Bloco '+(+b.num||b.num); });
+  fillFinder(); showPanels();
   if(cur==='pv') renderPreview();
 }
 
