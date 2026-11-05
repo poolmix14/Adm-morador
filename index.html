@@ -161,10 +161,6 @@ main{max-width:1250px;margin:0 auto;padding:16px 16px calc(40px + env(safe-area-
 .seg button{border:0;background:none;padding:8px 14px;border-radius:8px;font-weight:600;font-size:14px;color:var(--muted)}
 .seg button.on{background:var(--navy);color:#fff}
 .pv-note{font-size:13px;color:var(--muted);margin:0 0 12px}
-.pvbar{display:flex;align-items:center;gap:8px;margin:0 -16px 10px;padding:8px 16px;flex-wrap:wrap;position:sticky;top:calc(var(--hh,120px) - 10px);z-index:10;background:var(--bg)}
-.pvbar .zbtn{width:36px;height:36px;border:0;border-radius:9px;background:#fff;color:var(--navy);font-size:20px;font-weight:700;box-shadow:0 1px 3px rgba(0,0,0,.08);display:grid;place-items:center}
-.pvbar #zVal{min-width:64px;height:36px;border:0;border-radius:9px;background:#fff;color:var(--navy);font-weight:700;font-size:14px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
-.pvbar .pv-note{margin:0 0 0 4px}
 #pvSheets{overflow-x:auto;overflow-y:hidden;touch-action:pan-x pan-y;-webkit-overflow-scrolling:touch;padding-bottom:4px}
 .pvwrap{margin:0 auto 18px;box-shadow:0 4px 18px rgba(20,33,61,.18);background:#fff;overflow:hidden}
 .pvwrap .sheet{transform-origin:0 0}
@@ -231,13 +227,6 @@ main{max-width:1250px;margin:0 auto;padding:16px 16px calc(40px + env(safe-area-
       <button data-m="geral">Planilha geral</button>
       <button data-m="tel">Telefones</button>
       <button data-m="veic">Veículos</button>
-    </div>
-    <p class="pv-note" id="pvNote"></p>
-    <div class="pvbar">
-      <button class="zbtn" id="zMenos" aria-label="Diminuir zoom">−</button>
-      <button id="zVal" title="Voltar ao tamanho normal">100%</button>
-      <button class="zbtn" id="zMais" aria-label="Aumentar zoom">+</button>
-      <span class="pv-note">Zoom só na folha: use dois dedos ou os botões.</span>
     </div>
     <div id="pvSheets"></div>
   </section>
@@ -832,7 +821,6 @@ function renderPreview(){
   if(pvDirty || pvModo!==m){
     const pages = MODOS[m].pages();
     box.innerHTML = pages.map(p=>`<div class="pvwrap" data-w="${p.w}" data-h="${p.h}">${sheetHTML(p)}</div>`).join('');
-    document.getElementById('pvNote').textContent = `${MODOS[m].nota} Total: ${pages.length} folha${pages.length>1?'s':''} A4.`;
     pvDirty = false; pvModo = m;
   }
   scalePreview();
@@ -865,11 +853,7 @@ function setPvZoom(z, cx, cy){
   pvZoom = z; scalePreview();
   box.scrollLeft = px - (cx - r.left);
   window.scrollTo(0, (r.top + scrollY) + pyDoc - cy);
-  document.getElementById('zVal').textContent = Math.round(z*100) + '%';
 }
-document.getElementById('zMais').onclick = ()=> setPvZoom(pvZoom*1.5);
-document.getElementById('zMenos').onclick = ()=> setPvZoom(pvZoom/1.5);
-document.getElementById('zVal').onclick = ()=> setPvZoom(1);
 (()=>{
   const box = document.getElementById('pvSheets');
   let d0 = 0, z0 = 1, lastTap = 0;
